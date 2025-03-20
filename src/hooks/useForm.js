@@ -1,29 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import _ from 'lodash';
-import { defaultProgramTrackedEntityAttributeDisable, FAMILY_MEMBER_METADATA_CUSTOMUPDATE, FAMILY_MEMBER_VALUE, MIN_MAX_TEXT, MOBILE_NUM_REGEX, TYPE_OF_ACTION } from '@/components/constants';
+import { FAMILY_MEMBER_METADATA_CUSTOMUPDATE, MIN_MAX_TEXT, MOBILE_NUM_REGEX } from '@/components/constants';
+import { useSelector } from 'react-redux';
 
-const useForm = (metadata, data, allowFormEditable, uiLocale) => {
-    const [formMetadata, setMetadata] = useState(metadata);
+const useForm = (data, uiLocale) => {
+    // const [formMetadata, setMetadata] = useState(metadata);
     const [formData, setFormData] = useState(data);
     const [warningLocale, setWarningLocale] = useState(uiLocale);
     const [validationText, setValidationText] = useState({});
 
+    const formAttrMetaData = useSelector(state => state.metadata?.formMetaData || []);
+
+    // console.log('formAttrMetaData :>> ', formAttrMetaData);
+
     const validationTypes = ['compulsory'];
     const prevData = useRef(data);
-
-    useEffect(() => {
-        if (formMetadata.length > 0) {
-            const updatedMeta = formMetadata.map((meta) => {
-                return {
-                    ...meta,
-                    disabled: data['isNew'] ? defaultProgramTrackedEntityAttributeDisable.includes(meta.id) : defaultProgramTrackedEntityAttributeDisable.includes(meta.id) ? true : !allowFormEditable
-                }
-            });
-            setMetadata([...updatedMeta]);
-            // console.log('allowFormEditable useEffect called!', allowFormEditable, updatedMeta)
-        }
-
-    }, [allowFormEditable])
 
     const validationCheck = (type, value) => {
         console.log('validationCheck called')
@@ -75,164 +66,9 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
 
     };
 
-
     const initFromData = (data) => {
         setFormData(data);
     };
-
-    // const validateFamilyMemberForm = (cloneMetadata, property, value) => {
-
-    //     switch (property) {
-    //         // handle form validation on besis of DOB
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB:
-    //             const age = calculateAge(value);
-    //             formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE] = age;
-
-    //             if (age < 16) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER] = null
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER].hidden = true
-    //             } else cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER].hidden = false
-
-    //             if (age < 2) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_MORDEN_EDUCATION] = null
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_ATTENDING_TRADITIONAL_LERNING] = null
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_MORDEN_EDUCATION].hidden = true
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_ATTENDING_TRADITIONAL_LERNING].hidden = true
-    //             }
-    //             if (age < 18 || age > 75) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_PYLORI_SCREENING] = null
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_PYLORI_SCREENING].hidden = true
-    //             }
-
-    //             // formData[property] = value;
-    //             break;
-    //         // handle form validation on besis of membership status
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS:
-
-    //             switch (value) {
-    //                 case FAMILY_MEMBER_VALUE.PRESENT:
-    //                     formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO] = null;
-    //                     cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO].hidden = true
-
-    //                     break;
-
-    //                 case FAMILY_MEMBER_VALUE.DEMISE:
-    //                     formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO] = null;
-    //                     cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO].hidden = true
-    //                 default:
-    //                     formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO] = value;
-    //                     cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO].hidden = false
-
-    //                     formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO] = value;
-    //                     cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO].hidden = false
-    //                     break;
-    //             }i
-
-    //         // formData[property] = value;
-
-    //         // handle form validation on besis of membership gender
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX:
-    //             const userAge = formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE]
-    //             switch (value) {
-    //                 case TYPE_OF_ACTION.MALE:
-    //                     formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTEDFOR_CERVICAL_CANCER] = null;
-    //                     formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTED_BREAST_CANCER] = null;
-
-    //                     cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTEDFOR_CERVICAL_CANCER].hidden = true
-    //                     cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTED_BREAST_CANCER].hidden = true
-
-    //                     break;
-
-    //                 case TYPE_OF_ACTION.FEMALE:
-    //                     if (userAge < 30 || userAge > 65) formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTEDFOR_CERVICAL_CANCER] = null;
-    //                     else if (userAge < 40 || userAge > 65) formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTED_BREAST_CANCER] = null;
-    //                     break;
-
-    //                 default:
-    //                     break;
-    //             }
-    //         // formData[property] = value;
-
-    //         // handle the form validation on the besis of tranferd ot filed
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO:
-    //             const sex = formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX]
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CURRENT_MARITAL_STATUS:
-    //             if (value == TYPE_OF_ACTION.NEVER_MARRIED) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.FIRST_MARRIGE_AGE] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.FIRST_MARRIGE_AGE].hidden = true
-    //             } else {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.FIRST_MARRIGE_AGE] = value;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.FIRST_MARRIGE_AGE].hidden = false
-    //             }
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTEDFOR_CERVICAL_CANCER:
-    //             if (value == TYPE_OF_ACTION.NO) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_CERVICAL_CANCER_LASTYEAR] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_CERVICAL_CANCER_LASTYEAR].hidden = true
-    //             } else {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_CERVICAL_CANCER_LASTYEAR] = value;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_CERVICAL_CANCER_LASTYEAR].hidden = true
-    //             }
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTED_BREAST_CANCER:
-    //             if (value == TYPE_OF_ACTION.NO) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_BREAST_CANCER_LASTYEAR] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_BREAST_CANCER_LASTYEAR].hidden = true
-    //             } else {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_BREAST_CANCER_LASTYEAR] = value;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_BREAST_CANCER_LASTYEAR].hidden = false
-    //             }
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_PYLORI_SCREENING:
-    //             if (value == TYPE_OF_ACTION.NO) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_RECENT_PYLORI_TEST] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_RECENT_PYLORI_TEST].hidden = false;
-    //             } else {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_RECENT_PYLORI_TEST] = value;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_RECENT_PYLORI_TEST].hidden = true;
-    //             }
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_GLASSES_OR_CONTANT_LENCES:
-    //             if (value == TYPE_OF_ACTION.YES) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_SEEING] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_SEEING].hidden = true;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_SEEING_GLASSES].hidden = false;
-    //             }
-    //             if (value == TYPE_OF_ACTION.NO) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_SEEING_GLASSES] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_SEEING_GLASSES].hidden = true;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_SEEING].hidden = false;
-    //             }
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_HEARING_AID:
-    //             if (value == TYPE_OF_ACTION.YES) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_HEARING] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_HEARING].hidden = true;
-    //             }
-    //             if (value == TYPE_OF_ACTION.NO) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_HEARING_WITH_AID] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_DIFFICUULTY_HEARING_WITH_AID].hidden = true;
-    //             }
-
-    //         case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_MANNER_OF_DEATH:
-    //             if (value != TYPE_OF_ACTION.ACCIDENTAL) {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_ACCIDENTAL] = null;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_ACCIDENTAL].hidden = true;
-    //             } else {
-    //                 formData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_ACCIDENTAL] = value;
-    //                 cloneMetadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_ACCIDENTAL].hidden = false;
-    //             }
-
-    //         default:
-    //             formData[property] = value;
-    //     }
-    //     console.log('dispatch:formData :>> ', formData);
-    //     // dispatch(changeMember({ ...formData, isUpdate: true })); //!important
-    //     // setFormData({ ...formData });
-    // }
-
-    // handle validation from form input value basis of prediclated field
 
     const changeValue = (property, value) => {
         console.log('changeValue called')
@@ -243,7 +79,9 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
             formData[property] = value;
         } else if (property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER && value.length > 8) {
 
-        } else formData[property] = value;
+        } else if (property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.NAME) {
+            formData[property] = value.replace(/[^a-zA-Z\s]/g, "");
+        } else formData[property] = value
 
         // formData[property] = value;
         setFormData({ ...formData });
@@ -251,7 +89,7 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
 
     const changeMetadata = (metadata) => {
         console.log('changeMetadata :>> ', metadata);
-        setMetadata(metadata);
+        // setMetadata(metadata);
         onSubmit();
     };
 
@@ -263,6 +101,7 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
         } else {
             return validationText[code] ? validationText[code].text : null;
         }
+
     };
 
     const onSubmit = (external) => {
@@ -271,7 +110,18 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
         let valText = {};
 
         validationTypes.forEach((vt) => {
-            let filterMDbyType = _.filter(formMetadata, { [vt]: true });
+            // let filterMDbyType = _.filter(formMetadata, { [vt]: true });
+            let filterMDbyType = []
+
+            for (let sectyionKey in formAttrMetaData) {
+                for (let filed in formAttrMetaData[sectyionKey]) {
+                    for (let ids in formAttrMetaData[sectyionKey][filed]) {
+                        if (formAttrMetaData[sectyionKey][filed][ids][vt]) {
+                            filterMDbyType.push(formAttrMetaData[sectyionKey][filed][ids])
+                        }
+                    }
+                }
+            }
 
             filterMDbyType.forEach((mdf) => {
                 let valRes = validationCheck(
@@ -291,11 +141,6 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
         customValidationCheck('contact', FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER, valText)
 
         // custom fileds validations
-
-
-
-
-
         setValidationText(valText);
 
         return _.isEmpty(valText);
@@ -303,14 +148,14 @@ const useForm = (metadata, data, allowFormEditable, uiLocale) => {
 
     const clear = () => {
         setFormData({});
-        setMetadata([]);
+        // setMetadata([]);
         setWarningLocale({});
     };
 
     const editCallback = () => { };
 
     return {
-        formMetadata,
+        // formMetadata,
         prevData,
         changeMetadata,
         formData,

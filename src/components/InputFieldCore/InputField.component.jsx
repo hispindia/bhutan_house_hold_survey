@@ -56,6 +56,7 @@ const InputField = ({
           handleBlur={onBlur}
           handleChange={onChange}
           disabled={disabled}
+          valueType={valueType}
           {...props}
         />
       );

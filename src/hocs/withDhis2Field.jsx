@@ -6,11 +6,13 @@ const withDhis2Field = (dhis2Fields) => (Component) => {
         if (!field) {
             return `${id} not found`;
         }
+
         return (
             <Component
                 valueSet={field.valueSet}
                 valueType={field.valueType}
                 id={field.id}
+                hidden={field.hidden}
                 compulsory={field.compulsory}
                 displayFormName={field.displayFormName}
                 {...props}

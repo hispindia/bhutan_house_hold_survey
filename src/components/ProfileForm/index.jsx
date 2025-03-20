@@ -119,15 +119,6 @@ const ProfileForm = ({
         </div>
       </div>
       <div className="row col-lg-12">
-        {/* <div className="col-lg-3">
-          <FormNoInputContainer
-            id="G9KYJZ8dW76"
-            initialValue={profile.attributes.G9KYJZ8dW76}
-            disabled={!isEdit}
-            size="large"
-            form={form}
-          />
-        </div> */}
         <div className="col-lg-3">
           <Dhis2FormItem
             id="b4UUhQPwlRH"
@@ -144,13 +135,21 @@ const ProfileForm = ({
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
+        <div className="col-lg-3">
+          <Dhis2FormItem
+            id="kvCvhyGBLIi"
+          // displayFormName={t("houseNumber")}
+          >
+            <InputField size="large" disabled={!isEdit} />
+          </Dhis2FormItem>
+        </div>
 
         <div className="col-lg-3">
           <Dhis2FormItem id="alEL4UIuRee"          >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
-        
+
         <div className="col-lg-3">
           <Dhis2FormItem
             id="WcKI8B0MYaB"
@@ -159,175 +158,27 @@ const ProfileForm = ({
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
-        {/* <div className="col-lg-3">
+
+        <div className="col-lg-3">
           <Dhis2FormItem
             id="SHPW4d00NnM"
-            // displayFormName={t("houseNumber")}
+          // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
-        </div> */}
+        </div>
+
+        <div className="col-lg-3">
+          <Dhis2FormItem
+            id="HP5XaFj6iZ7"
+          // displayFormName={t("houseNumber")}
+          >
+            <InputField size="large" disabled={!isEdit} />
+          </Dhis2FormItem>
+        </div>
+
       </div>
-      {/* <div className="row col-lg-12">
-        <div className="col-lg-3">
-          <Dhis2FormItem
-            id="nYcHuUDqeBY"
-            displayFormName={t("telephoneNumber")}
-          >
-            <InputField size="large" disabled={!isEdit} />
-          </Dhis2FormItem>
-        </div>
-      </div> */}
-      {/* <div className="row col-lg-12">
-        <div className="col-lg-3">
-          <Dhis2FormItem
-            dependentFields={["rzGghDo5ipI"]}
-            setValuesFunc={([residenceStatus]) => ({
-              AiwUJOsOC86: residenceStatus === "Residence" ? "true" : "false",
-            })}
-            childPropsFunc={([residenceStatus]) => {
-              return {
-                disabled: ["Student", "Mobile worker", "Others"].includes(
-                  residenceStatus
-                ),
-              };
-            }}
-            id="AiwUJOsOC86"
-            displayFormName={t("familyRegistered")}
-          >
-            <InputField size="large" disabled={!isEdit} />
-          </Dhis2FormItem>
-        </div>
-        <div className="col-lg-9">
-          <div className="row">
-            <div className="col-lg-4">
-              <Dhis2FormItem
-                displayFormName={t("tempBookNumber")}
-                dependentFields={[
-                  "rzGghDo5ipI",
-                  "AiwUJOsOC86",
-                  "xbwURy2jG2K",
-                  "W8WZcI1SUjC",
-                  "CKQuSLAY0Xf",
-                ]}
-                showFieldFunc={([residenceStatus, familyRegistered]) =>
-                  residenceStatus !== "Others" && familyRegistered === "false"
-                }
-                setValuesFunc={([
-                  residenceStatus,
-                  familyRegistered,
-                  unitOfVillage,
-                  houseNumber,
-                  temporaryBookNumber,
-                ]) => {
-                  const generatedValue = handleGenerateTemporaryBookNumber([
-                    residenceStatus,
-                    unitOfVillage,
-                    houseNumber,
-                    temporaryBookNumber,
-                  ]);
 
-                  return {
-                    CKQuSLAY0Xf: generatedValue,
-                  };
-                }}
-                id="CKQuSLAY0Xf"
-              >
-                <InputField size="large" disabled={true} />
-              </Dhis2FormItem>
-            </div>
-            <div className="col-lg-5">
-              <CFormControl
-                noStyle
-                dependentFields={["rzGghDo5ipI", "AiwUJOsOC86"]}
-                showFieldFunc={([residenceStatus, familyRegistered]) =>
-                  residenceStatus !== "Others" && familyRegistered === "false"
-                }
-                childPropsFunc={([residenceStatus, familyRegistered]) => {
-                  let newValues = {};
-                  if (residenceStatus === "Residence") {
-                    newValues = {
-                      BgKZvUxweKO: returnValueForVillageSelector("province"),
-                      utW5gK4ihvz: returnValueForVillageSelector("district"),
-                      XwnHdecsbvz: returnValueForVillageSelector("village"),
-                    };
-                  } else {
-                    newValues = {
-                      utW5gK4ihvz: profile.attributes["utW5gK4ihvz"] || "",
-                      BgKZvUxweKO: profile.attributes["BgKZvUxweKO"] || "",
-                      XwnHdecsbvz: profile.attributes["XwnHdecsbvz"] || "",
-                    };
-                  }
-
-                  const currentProvince = newValues["BgKZvUxweKO"];
-                  const currentDistrict = newValues["utW5gK4ihvz"];
-                  const currentVillage = newValues["XwnHdecsbvz"];
-
-                  form.setFieldsValue(newValues);
-
-                  return {
-                    config: {
-                      labels: [
-                        "Please select province / ກະລຸນາເລຶອກແຂວງ",
-                        "Please select district / ກະລຸນາເລຶອກເມືອງ",
-                        "Please select village / ກະລຸນາເລຶອກບ້ານ",
-                      ],
-                      hierachy: villageHierarchy,
-                      initSelections: [
-                        currentProvince,
-                        currentDistrict,
-                        currentVillage,
-                      ],
-                      disabled:
-                        !isEdit ||
-                        (residenceStatus === "Residence" &&
-                          familyRegistered === "false"),
-                      select: (selections) => {
-                        form.setFieldsValue({
-                          BgKZvUxweKO: selections[0]?.value,
-                          utW5gK4ihvz: selections[1]?.value,
-                          XwnHdecsbvz: selections[2]?.value,
-                        });
-                      },
-                    },
-                  };
-                }}
-              >
-                <Form.Item name="BgKZvUxweKO" noStyle hidden />
-                <Form.Item name="utW5gK4ihvz" noStyle hidden />
-                <Form.Item name="XwnHdecsbvz" noStyle hidden />
-                <HierachySelector />
-              </CFormControl>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-lg-4">
-              <Dhis2FormItem
-                id="gSImG6wxCkY"
-                displayFormName={t("familyBookNumber")}
-                dependentFields={["AiwUJOsOC86"]}
-                showFieldFunc={([familyRegistered]) =>
-                  familyRegistered === "true"
-                }
-              >
-                <InputField size="large" disabled={!isEdit} />
-              </Dhis2FormItem>
-            </div>
-            <div className="col-lg-4">
-              <Dhis2FormItem
-                dependentFields={["rzGghDo5ipI"]}
-                showFieldFunc={([residenceStatus]) =>
-                  residenceStatus === "Others"
-                }
-                id="UQdxC9ojcju"
-                displayFormName={t("specifyresidentdetails")}
-              >
-                <InputField size="large" disabled={!isEdit} />
-              </Dhis2FormItem>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <Space>
         <Button.Group>
           {!isEdit ? (

@@ -22,6 +22,13 @@ import "./CascadeTable.styles.css";
 import { transformData, transformMetadataToColumns } from "./utils";
 import { CloseOutlined } from "@ant-design/icons";
 import { Switch, Tooltip } from "antd";
+import moment from "moment";
+import { convertAttributesToForm, modifiedFormAttributesDisabledEnabled } from "@/utils/formMetadeta";
+import { houseHoldMemberFormMetaData } from "@/redux/actions/metadata";
+import { LocalStorageMemberForm, LocalStorageSelecteRow } from "@/utils/localStorageManager";
+
+const formModel = new LocalStorageMemberForm();
+const rowModel = new LocalStorageSelecteRow();
 
 const DeleteConfirmationButton = withDeleteConfirmation(Button);
 
@@ -50,18 +57,17 @@ const CascadeTable = (props) => {
   const { year } = useSelector((state) => state.data.tei.selectedYear);
   const { immutableYear } = useSelector((state) => state.metadata);
   const { currentCascade } = useSelector((state) => state.data.tei.data);
+
   const dispatch = useDispatch();
-  const [columns, setColumns] = useState(
-    transformMetadataToColumns(metadata, locale)
-  );
-  // const { ouPattern } = useSelector((state) => state.data.tei);
+  const [columns, setColumns] = useState(transformMetadataToColumns(metadata, locale));
   const profile = useSelector((state) => state.data.tei.data.currentTei);
+  const { programMetadataMember } = useSelector((state) => state.metadata);
+  const formAttrMetaData = useSelector(state => state.metadata?.formMetaData || []);
 
-  const [showData, setShowData] = useState(
-    transformData(metadata, props.data, dataValuesTranslate, locale)
-  );
+  const [showData, setShowData] = useState(transformData(metadata, props.data, dataValuesTranslate, locale));
 
-  // console.log(' profile :>> ',  profile);
+  // console.log(' columns :>> ', columns, showData);
+
   const [selectedData, setSelectedData] = useState({});
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
@@ -78,9 +84,13 @@ const CascadeTable = (props) => {
 
   const clearForm = () => {
     setSelectedData({});
+    rowModel.set({});
     setMetadata(originMetadata);
     setSelectedRowIndex(null);
     setFormStatus(FORM_ACTION_TYPES.NONE);
+    formModel.set(FORM_ACTION_TYPES.NONE)
+
+    setEditable(false)
   };
 
   const handleEditRow = (e, row, rowIndex) => {
@@ -112,21 +122,12 @@ const CascadeTable = (props) => {
   const handleBeforeAddNewRow = () => {
     // Before add new data
     setFormStatus(FORM_ACTION_TYPES.ADD_NEW);
+    formModel.set(FORM_ACTION_TYPES.ADD_NEW)
+
+
     setSelectedData({ id: generateUid(), isNew: true, "hDE1WNqTTwF": profile.attributes["b4UUhQPwlRH"] });
-    // setMetadata(JSON.parse(JSON.stringify(originMetadata)));
+    rowModel.set({ id: generateUid(), isNew: true, "hDE1WNqTTwF": profile.attributes["b4UUhQPwlRH"] });
     setSelectedRowIndex(null);
-
-    // set intial conditon for new form
-    // if (metadata.length > 0) {
-    //   const updatedMeta = metadata.map((meta) => {
-    //     return {
-    //       ...meta,
-    //       disabled: false,
-    //     }
-    //   });
-
-      // setMetadata([...updatedMeta]);
-    // }
   };
 
   const handleAddNewRow = (e, row, continueAdd) => {
@@ -165,25 +166,11 @@ const CascadeTable = (props) => {
   const handleSelectRow = (e, row, rowIndex) => {
     console.log("selected", row);
     setFormStatus(FORM_ACTION_TYPES.EDIT);
+    formModel.set(FORM_ACTION_TYPES.EDIT)
+    rowModel.set(row);
     setSelectedData(row);
     setSelectedRowIndex(rowIndex);
-
-    // if (metadata) {
-    //   metadata.forEach((meta) => meta.disabled = true)
-    //   setMetadata([...metadata]);
-    // }
-
-    // set form selected row conditon for new form
-    // if (metadata.length > 0) {
-    //   const updatedMeta = metadata.map((meta) => {
-    //     return {
-    //       ...meta,
-    //       disabled: true,
-    //     }
-    //   });
-
-    //   setMetadata([...updatedMeta]);
-    // }
+    setEditable(true);
   };
 
   const handleDeleteRow = (e, row) => {
@@ -303,6 +290,13 @@ const CascadeTable = (props) => {
     );
     setDataValuesTranslate(tempDataValuesTranslate);
 
+
+    // handle reloading 
+    const row = rowModel.get()
+    setFormStatus(formModel.get());
+    setSelectedData(row);
+    setEditable(row['isNew'] ? false : true)
+
     return () => {
       console.log("Cascade table unmounted");
       clearForm();
@@ -323,6 +317,25 @@ const CascadeTable = (props) => {
     initFunction && initFunction(cloneMetadata, dataRows);
     setMetadata([...Object.values(cloneMetadata)]);
   }, [JSON.stringify(metadata)]);
+
+  useEffect(() => {
+    let modifiedForms = convertAttributesToForm(programMetadataMember);
+    if (formStatus === FORM_ACTION_TYPES.EDIT) {
+      modifiedForms = modifiedFormAttributesDisabledEnabled(modifiedForms, true)
+    }
+
+    // handle fileds for previous value
+    Object.entries(selectedData).forEach(([key, value]) => {
+      editRowCallback(modifiedForms, {}, selectedData, key, value);
+    });
+
+    // dispatch(houseHoldMemberFormMetaData(modifiedForms));
+
+    return () => {
+      dispatch(houseHoldMemberFormMetaData({}));
+    }
+  }, [selectedData])
+
 
   const columnsC = [
     {
@@ -371,14 +384,14 @@ const CascadeTable = (props) => {
     },
   ];
 
-  const handleCancelForm = () => {
-    setEditable(false)
-    setFormStatus(FORM_ACTION_TYPES.NONE);
-  };
-
-
   const handleAllowEditable = (eValue) => {
-    setEditable(eValue)   
+    setEditable(eValue)
+
+    if (!data['isNew']) {
+      const modifiedEle = modifiedFormAttributesDisabledEnabled(formAttrMetaData, eValue)
+      console.log('modifiedEle', modifiedEle)
+      dispatch(houseHoldMemberFormMetaData(modifiedEle));
+    }
   }
   return (
     <div className="bootstrap-iso">
@@ -400,9 +413,9 @@ const CascadeTable = (props) => {
                     {t("familyMemberDetails")}
                     <div className="gap-5 text-right">
                       {formStatus == FORM_ACTION_TYPES.EDIT ?
-                        <Switch checked={editable} onChange={() => setEditable(!editable)} checkedChildren="Editable" unCheckedChildren="Enable For edit" />
+                        <Switch checked={!editable} onChange={() => handleAllowEditable(!editable)} checkedChildren="Editable" unCheckedChildren="Enable For edit" />
                         : ''}
-                      <Button type="text" className="btn btn-light" onClick={handleCancelForm}>
+                      <Button type="text" className="btn btn-light" onClick={clearForm}>
                         <CloseOutlined />
                       </Button>
                     </div>
@@ -414,7 +427,7 @@ const CascadeTable = (props) => {
                   </Card.Subtitle>
                   <CaptureForm
                     locale={locale}
-                    metadata={metadata}
+                    // metadata={metadata}
                     rowIndex={selectedRowIndex}
                     data={_.cloneDeep(selectedData)}
                     formStatus={formStatus}
@@ -423,7 +436,7 @@ const CascadeTable = (props) => {
                     handleAddNewRow={handleAddNewRow}
                     editRowCallback={editRowCallback}
                     allowFormEditable={editable}
-                    maxDate={new Date()}
+                    maxDate={moment(new Date()).format('YYYY-MM-DD')}
                     minDate={new Date(`1900-12-31`)}
                   />
                 </Card.Body>

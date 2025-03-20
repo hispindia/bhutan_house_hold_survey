@@ -2,6 +2,14 @@ import React from "react";
 import { generateUid } from "@/utils";
 import _ from "lodash";
 
+export function booleanValueSeperator(val) {
+  switch (val) {
+    case 'true': return 'Yes';
+    case 'false': return 'No';
+    default: return val;
+  }
+}
+
 const transformMetadataToColumns = (metadata, locale, dataValuesTranslate) => {
   const cols = [];
   metadata
@@ -42,7 +50,7 @@ const transformMetadataToColumns = (metadata, locale, dataValuesTranslate) => {
 
       cols.push(colC);
     });
-  return cols;
+  return cols
 };
 
 const transformD = (metadata, data, dataValuesTranslate, locale) => {
@@ -91,7 +99,11 @@ const transformData = (metadata, datas, dataValuesTranslate, locale) => {
       });
   });
 
-  return datas_clone;
+  return datas_clone.map(obj => {
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => [key, value === "true" ? "Yes" : value === "false" ? "No" : value])
+    );
+  });
 };
 
 export { transformMetadataToColumns, transformData, transformD };

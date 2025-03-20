@@ -13,7 +13,9 @@ import { changeTab } from "../../redux/actions/data";
 import { compose } from "redux";
 import withFeedback from "../../hocs/withFeedback";
 import { Button, Space } from "antd";
+import { LocalStorageTab } from "@/utils/localStorageManager";
 
+const localTab = new LocalStorageTab();
 const LoadingFormContainer = compose(
   withFeedback(),
   withSkeletonLoading(Form)
@@ -35,6 +37,8 @@ const FormContainer = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getTei());
+    dispatch(changeTab(localTab.get()));
+    console.log('localTab.get()', localTab.get())
     return () => {
       dispatch(clear());
     };
@@ -46,6 +50,7 @@ const FormContainer = () => {
 
   const onTabChange = (tabId) => {
     dispatch(changeTab(tabId));
+    localTab.set(tabId)
   };
 
   const backToListPage = () => {

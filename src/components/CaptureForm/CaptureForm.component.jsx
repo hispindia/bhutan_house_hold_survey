@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { FORM_ACTION_TYPES } from "../constants";
+import React, { useEffect, useMemo } from "react";
+import { FORM_ACTION_TYPES, HAS_INITIAN_NOVALUE } from "../constants";
 import useForm from "../../hooks/useForm";
 import { InputAdornment } from "@material-ui/core";
 import _ from "lodash";
@@ -19,7 +19,7 @@ function CaptureForm(props) {
   const {
     classes,
     className,
-    metadata,
+    // metadata,
     data,
     rowIndex,
     formStatus,
@@ -31,8 +31,6 @@ function CaptureForm(props) {
     allowFormEditable,
     ...other
   } = props;
-  const { programMetadataMember } = useSelector((state) => state.metadata);
-  const { programSections, programStages } = programMetadataMember;
   const {
     formData,
     prevData,
@@ -44,32 +42,15 @@ function CaptureForm(props) {
     validation,
     onSubmit,
     clear,
-  } = useForm(_.cloneDeep(metadata), data, allowFormEditable, {
+  } = useForm(data, {
     compulsory: t("thisFieldIsRequired"),
   });
 
-
-  console.log('formMetadata :>> ', formMetadata);
+  const formAttrMetaData = useSelector(state => state.metadata?.formMetaData || []);
 
   useEffect(() => {
     initFromData(data);
-
-    // let cloneMetadata = _.cloneDeep(metadata).reduce((obj, md) => {
-    // let cloneMetadata = _.cloneDeep(formMetadata).reduce((obj, md) => {
-    //   obj[md.code] = md;
-
-    //   return obj;
-    // }, {});
-
-    // if (data) {
-    //   editRowCallback(cloneMetadata, null, data, null, null);
-    // }
-    // changeMetadata([...Object.values(cloneMetadata)]);
-
-      editRowCallback([], null, data, null, null);
-
   }, [data.id]);
-  // }, []);
 
   useEffect(() => {
     return () => {
@@ -78,30 +59,24 @@ function CaptureForm(props) {
     };
   }, []);
 
-
-  const editCall = (metadata, prevData, formData, code, value) => {
-    console.log('editCall called')
+  const editCall = (formAttrMetaData, prevData, formData, code, value, sectionKey) => {
+    console.log('editCall called', code, value, sectionKey)
     let data = _.clone(formData);
-    let cloneMetadata = _.clone(metadata).reduce((obj, md) => {
-      obj[md.code] = md;
-      return obj;
-    }, {});
 
-    editRowCallback(cloneMetadata, prevData, data, code, value);
-
+    editRowCallback(formAttrMetaData, prevData, data, code, value, sectionKey);
     setFormData({ ...data });
-    changeMetadata([...Object.values(cloneMetadata)]);
   };
 
-  const generateFields = (formMetaData) => {
-    return formMetaData
-      .filter((f) => !f.additionCol)
-      .filter((f) => !f.hidden)
-      .map((f) => {
+  const generateFields = (formMetaData, sectionKey) => {
+    return Object.keys(formMetaData)
+      .filter((f) => !formMetaData[f].hidden)
+      .map((item) => {
+        let f = formMetaData[item]
         return (
           <div className="col-lg-3 mb-3" key={f.code}>
             <InputField
-              disabled={f.disabled}
+              id={f.id}
+              disabled={f.permanentDisabled == true ? true : f.disabled}
               locale={locale}
               {...(_.has(f, "periodType") && {
                 periodType: f.periodType,
@@ -119,11 +94,12 @@ function CaptureForm(props) {
 
               onBlur={(value) =>
                 editCall(
-                  formMetadata,
+                  formAttrMetaData,
                   prevData.current,
                   formData,
                   f.code,
-                  value
+                  value,
+                  sectionKey
                 )
               }
               onChange={(value) => {
@@ -137,83 +113,12 @@ function CaptureForm(props) {
               error={validation(f.code)}
               maxDate={props.maxDate}
               minDate={"1900-12-31"}
-            />
+            >
+            </InputField>
           </div>
         );
-      });
-  };
-
-  const generateSectionFields = () => {
-    if (!programSections || programSections.length === 0) {
-      const trackedEntityAttributes =
-        programMetadataMember.trackedEntityAttributes.map((t) => t.id);
-      const TEIFormMetadata = formMetadata.filter((f) =>
-        trackedEntityAttributes.includes(f.id)
-      );
-      return <div className="row">{generateFields(TEIFormMetadata)}</div>;
-    }
-
-    return programSections.map((pSection) => {
-      const trackedEntityAttributes = pSection.trackedEntityAttributes.map(
-        (tea) => tea.id
-      );
-      const TEIFormMetadata = formMetadata
-        .filter((f) => trackedEntityAttributes.includes(f.id))
-        .sort(
-          (a, b) =>
-            trackedEntityAttributes.indexOf(a.id) -
-            trackedEntityAttributes.indexOf(b.id) || a.id.localeCompare(b.id)
-        );
-
-      return (
-        <div className="row">
-          <div class="card-body">
-            <h5 class="card-title">{pSection.displayName}</h5>
-            <p class="card-text">
-              <div className="row">{generateFields(TEIFormMetadata)}</div>
-            </p>
-          </div>
-        </div>
-      );
-    });
-  };
-
-  const generateProgramStageSectionFields = () => {
-    if (
-      programStages?.some((pStage) => pStage.programStageSections.length === 0)
-    ) {
-      return programStages.map((pStage) => {
-        const dataElements = pStage.dataElements.map((t) => t.id);
-        const programFormMetadata = formMetadata.filter((f) =>
-          dataElements.includes(f.id)
-        );
-
-        return <div className="row">{generateFields(programFormMetadata)}</div>;
-      });
-    }
-
-    return programStages.map((pStage) => {
-      const programStageSections = pStage.programStageSections;
-      return programStageSections.map((pSection) => {
-        const dataElements = pSection.dataElements.map((tea) => tea.id);
-        const programFormMetadata = formMetadata.filter((f) => dataElements.includes(f.id)).sort((a, b) =>
-          dataElements.indexOf(a.id) - dataElements.indexOf(b.id) ||
-          a.id.localeCompare(b.id)
-        );
-
-        return (
-          <div className="row">
-            <div class="card-body">
-              <h5 class="card-title">{pSection.displayName}</h5>
-              <p class="card-text">
-                <div className="row">{generateFields(programFormMetadata)}</div>
-              </p>
-            </div>
-          </div>
-        );
-      });
-    });
-  };
+      })
+  }
 
   const handleCancelForm = () => {
     setFormStatus(FORM_ACTION_TYPES.NONE);
@@ -240,12 +145,26 @@ function CaptureForm(props) {
     <>
       <div className="row">
         <div className="col-md-12">
-          {generateSectionFields()}
-          {generateProgramStageSectionFields()}
 
-          {/* {generateFields(formMetadata)} */}
+          {Object.keys(formAttrMetaData)
+            .filter((f) => !formAttrMetaData[f].additionCol)
+            .filter((f) => !formAttrMetaData[f].hidden)
+            .map((mItem) => {
+              return (
+                <div className="row" key={mItem}>
+                  <div class="card-body">
+                    <h5 class="card-title">{mItem}</h5>
+                    <p class="card-text">
+                      <div className="row">{generateFields(formAttrMetaData[mItem].fileds, mItem)}</div>
+                    </p>
+                  </div>
+                </div>
+              )
+            })
+          }
         </div>
       </div>
+
       <div className="row">
         <div className="col-md-12">
           <div className="btn-toolbar" role="toolbar">
@@ -299,7 +218,9 @@ function CaptureForm(props) {
       </div>
     </>
   );
-}
+
+};
+
 
 CaptureForm.propTypes = {};
 

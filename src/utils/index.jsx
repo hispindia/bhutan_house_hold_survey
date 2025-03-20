@@ -319,3 +319,7 @@ export const onKeyDown = (event, pattern) => {
     event.preventDefault();
   }
 };
+
+export const handleLocalstorage = () => {
+
+}

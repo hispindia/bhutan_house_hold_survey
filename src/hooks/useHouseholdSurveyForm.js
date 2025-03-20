@@ -9,7 +9,7 @@ const useHouseholdSurveyForm = (values) => {
     const [surveyList, setSurveyList] = useState([])
 
     const malariyaStrictedDelements = ['dhOvYypmAKV', 'GkBNgm5nJFM', 'PflI8FU0Rpd', 'aoQkCHSTvA2', 'uy9zZpHKaom', 'LDTBV6f9x5j', 'keBvW7IyXli']
-    const hideForMaleria = ["GtSSMCc6nXz", "Ojvu6krZKBX", "WTFyAoDjI4X", "S4G690Rx8KD", "FL0F1NaV4e2", "b60lyh4IRgb", "uMRfJEDErNx"]
+    const hideForMaleria = ["GtSSMCc6nXz", "Ojvu6krZKBX", "WTFyAoDjI4X", "S4G690Rx8KD", "FL0F1NaV4e2", "b60lyh4IRgb", "uMRfJEDErNx", 'rWCn0WGoAeS']
 
     const selectedOuPath = useSelector((state) => state.metadata.selectedOrgUnit.path);
 
@@ -37,7 +37,7 @@ const useHouseholdSurveyForm = (values) => {
 
 
     function loadServeyFields(event = []) {
-
+        // console.log('event:>>>', event)
         const uuid = event[0]?.name[0]
         const value = event[0]?.value
 
@@ -62,43 +62,62 @@ const useHouseholdSurveyForm = (values) => {
                 let dwelling = ["Pipe in compound but outside the dwelling", "Piped in dwelling"]
 
                 if (value == "Pipe in compound but outside the dwelling") {
-                    values["lRVDgo5HwYe"] = "In own dwelling"
+                    values["lRVDgo5HwYe"] = "In own compound, yard/plot"
+                    // values["ADGaCK23IbP"] = null
+                    // tableRenderData.forEach(item => {
+                    //     if (item.uid == 'ADGaCK23IbP') { item.hidden = true }
+                    // })
+                    form.setFieldsValue(values);
+                } else if (value == "Piped in dwelling") {
+                    values["lRVDgo5HwYe"] = "In own dwelling";
+                    // values["ADGaCK23IbP"] = null;
 
                     // tableRenderData.forEach(item => {
-                    //     if (item.uid == 'lRVDgo5HwYe') { item.hidden = false }
+                    //     if (item.uid == 'ADGaCK23IbP') { item.hidden = true }
                     // })
-
                     form.setFieldsValue(values);
-                } if (value == "Piped in dwelling") {
-                    values["lRVDgo5HwYe"] = "In own dwelling"
+                } else {
                     // tableRenderData.forEach(item => {
-                    //     if (item.uid == 'lRVDgo5HwYe') { item.hidden = false }
+                    //     if (item.uid == 'ADGaCK23IbP') { item.hidden = false }
                     // })
-
+                    // values["lRVDgo5HwYe"] = null;
                     form.setFieldsValue(values);
                 }
-                // else if (!dwelling.includes(value)) {
-                //     values["lRVDgo5HwYe"] = null
-                //     tableRenderData.forEach(item => {
-                //         if (item.uid == 'lRVDgo5HwYe') { item.hidden = true }
-                //     })
+            } else if (uuid == 'lRVDgo5HwYe') {
+                console.trace('first')
+                if (value != "Elsewhere") values["ADGaCK23IbP"] = "Less than or equal to 30 minutes";
+                else values["ADGaCK23IbP"] = null;
+                form.setFieldsValue(values);
+            } else if (uuid == 'YGisOzETviK') {
+                // need to be chsanged'
+                // console.trace('pppppppp');
 
-                //     form.setFieldsValue(values);
-                // }
-                else {
-                    delete values["lRVDgo5HwYe"]
-                    form.setFieldsValue(values);
-                }
+                tableRenderData.forEach(item => {
+                    if (item.uid == 'pUnhWS1qOeS') {
+                        if (value == 'No Iodine Detected') item.hidden = false;
+                        else item.hidden = true;
+                    }
+                })
             } else if (uuid == "JT2QvZDPRAy") {
+                const ifExist = ['Flush to septic tank', 'Flush to pit latrine', "Ventilated improved pit", "Pit latrine with slab", "Pit latrine without slab", "Other improved toilet facility"]
                 if (value == "No facility/bush/field") {
                     tableRenderData.forEach(item => {
-                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'RIqHmgT1OWu')) { item.hidden = true }
+                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'RIqHmgT1OWu') || (item.uid == 'rlecl6N9HcX')) { item.hidden = true }
+                    })
+                    values["ySLtaPSULVN"] = null;
+                } else if (ifExist.includes(value)) {
+                    tableRenderData.forEach(item => {
+                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'rlecl6N9HcX')) { item.hidden = false }
                     })
 
-                    values["ySLtaPSULVN"] = null
+                } else if (!ifExist.includes(value)) {
+                    tableRenderData.forEach(item => {
+                        if (item.uid == "ySLtaPSULVN") { item.hidden = true }
+                    })
+                    values["ySLtaPSULVN"] = null;
                 } else {
                     tableRenderData.forEach(item => {
-                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'RIqHmgT1OWu')) { item.hidden = false }
+                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'RIqHmgT1OWu' || (item.uid == 'rlecl6N9HcX'))) { item.hidden = false }
                     })
 
                 }
@@ -106,19 +125,33 @@ const useHouseholdSurveyForm = (values) => {
 
             } else if (uuid == "ySLtaPSULVN") {
                 if (value == "Never emptied") {
-
                     tableRenderData.forEach(item => {
                         if (item.uid == "RIqHmgT1OWu") { item.hidden = true }
                     })
-
-                    values["RIqHmgT1OWu"] = null
+                    values["RIqHmgT1OWu"] = null;
                 } else {
-
                     tableRenderData.forEach(item => {
                         if (item.uid == "RIqHmgT1OWu") { item.hidden = false }
                     })
                 }
                 form.setFieldsValue(values);
+            } else if (uuid == 'b60lyh4IRgb') {
+                console.log('qwertyui');
+                if (value == 'true') {
+                    tableRenderData.forEach(item => {
+                        if (item.uid == "rWCn0WGoAeS") {
+                            item.permanentHide = true
+                            item.hidden = true
+                        }
+                    })
+                } else {
+                    tableRenderData.forEach(item => {
+                        if (item.uid == "rWCn0WGoAeS") {
+                            item.permanentHide = false
+                            item.hidden = false
+                        }
+                    })
+                }
 
             } else if (uuid == "R0AYFvHFg6u") {
                 let ifExist = ['No handwashing place in dwelling/yard/plot', 'No permission to see', 'Other reasons']
@@ -136,9 +169,8 @@ const useHouseholdSurveyForm = (values) => {
                     })
                 }
                 form.setFieldsValue(values);
-            }
-            else if (uuid == "GtSSMCc6nXz") {
-                let ifExist = ['Ojvu6krZKBX', 'WTFyAoDjI4X', 'S4G690Rx8KD', 'FL0F1NaV4e2', 'b60lyh4IRgb']
+            } else if (uuid == "GtSSMCc6nXz") {
+                let ifExist = ['Ojvu6krZKBX', 'WTFyAoDjI4X', 'S4G690Rx8KD', 'FL0F1NaV4e2', 'b60lyh4IRgb', 'rWCn0WGoAeS']
                 if (value == "false") {
 
                     tableRenderData.forEach(item => {
@@ -149,6 +181,7 @@ const useHouseholdSurveyForm = (values) => {
                     values["S4G690Rx8KD"] = null
                     values["FL0F1NaV4e2"] = null
                     values["b60lyh4IRgb"] = null
+                    values["rWCn0WGoAeS"] = null
                 } else if (value != "false") {
 
                     tableRenderData.forEach(item => {

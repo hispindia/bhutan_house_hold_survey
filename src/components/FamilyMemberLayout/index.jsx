@@ -1,8 +1,6 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
 
-import { Col, Row, Flex } from "antd";
-
 /* containers */
 import FamilyMemberFormContainer from "../../containers/FamilyMemberForm";
 import SideBarContainer from "../../containers/SideBar";

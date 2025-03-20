@@ -1,5 +1,6 @@
 import moment from "moment";
 import {
+  HOUSEHOLD_MEMBER_FORM_METADATA,
   SET_EVENT_DATE,
   SET_ORGUNITS,
   SET_ORGUNIT_GROUPS,
@@ -23,6 +24,7 @@ const initialState = {
   minDate: "2021-01-01",
   maxDate: moment().endOf("year").format("YYYY-MM-DD"),
   immutableYear: [2018, 2019],
+  formMetaData:{}
   // subtract(1, "years")
 };
 
@@ -86,6 +88,12 @@ export default function (state = initialState, action) {
       return {
         ...state,
         users: action.payload.users,
+      };
+    }
+    case HOUSEHOLD_MEMBER_FORM_METADATA: {
+      return {
+        ...state,
+        formMetaData: action.payload,
       };
     }
 

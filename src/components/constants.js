@@ -61,6 +61,9 @@ const MOBILE_NUM_REGEX = {
   msg: 'Contact number should be of 8 digits starting from 1 or 7;'
 }
 
+const NAME_REGEX = /^[A-Z][a-z]+(?:\s[A-Z][a-z]+)*$/;
+
+
 const TYPE_OF_ACTION = {
   EQUAL_TO: 'EQUAL_TO',
   EQUAL_NOT: 'EQUAL_NOT',
@@ -71,6 +74,7 @@ const TYPE_OF_ACTION = {
   NEVER_MARRIED: 'Never married',
   ACCIDENTAL: 'Accidental',
   NEVER: 'Never',
+  NO_DIFICULTY:'No difficulty'
 }
 
 export const MOTHER_CHILD_SECTION = ["Z4zfIkKCP7R", "VQRxvN71m5l", "jswy7SbqErA", "zxllKSJ52U1", "UjLxTtDk9qc", "mt37cOH28F9", "uQg4s7Jd8WW", "JgHcoI8Vs9v", "BdVVPG3a82M"]
@@ -112,6 +116,8 @@ export const HISTORY_OF_CHOLESTEROL = ['N3aQ8FrbXga', 'TBo8Lw8Rfis', 'OJaXOHWDGw
 export const HISTORY_OF_CARDIOVASCULAR = ['PBDkdqR3yWo', 'eWjobHqRmVR', 'En7TKezqhAz']
 export const HEIGHT_WEIGHT = ['iWaeCiMpBV9', 'pxqEppI9NuY', 'CszAgcZlA2I']
 export const WAISE_HIP_CIRCUMFERENCE = ['KfRuikfQldK', 'DBKh0M3rsKO']
+export const MOTHER_CHILD_CUSTOM_HIDE=['jswy7SbqErA','zxllKSJ52U1','UjLxTtDk9qc','JgHcoI8Vs9v','BdVVPG3a82M']
+export const MOTHER_CHILD_FORONE_YEAR=[]
 
 
 
@@ -119,12 +125,38 @@ export const BLOOD_PRESSURE_READING1 = ["CMyXmIIL2Pg", "RDXCYFo4Uv8", "kzp9TltHi
 export const BLOOD_PRESSURE_READING2 = ["ZwfMynjw1Ys", "ofyknwue3kI", "JJoDq26kmmy"]
 export const BLOOD_PRESSURE_READING3 = ["wEWyO97SUBc", "Bf0l1lc8HdR", "whGSwuEwp6B"]
 
-const defaultProgramTrackedEntityAttributeDisable = ['hDE1WNqTTwF', 'BaiVwt8jVfg']
+const defaultProgramTrackedEntityAttributeDisable = ['hDE1WNqTTwF', 'BaiVwt8jVfg','dzeTdP1U1b1']
+
+const MEMBER_FORM_VALIDATIONS_SECTION = {
+  DEMOGRAPHIC: "Demographic Information",
+  MEMBERSHIP_STATUS: "Membership Status",
+  MOTHER_CHILD_SECTION: "Mother and Child Health",
+  INDIVIDUAL_REGISTRATION: "Individual Registration",
+  WG_SORT: "WG Short Set on Functioning (WG-SS)",
+  PHYSICAL_MEASUREMENT: "Physical Measurements - Blood pressure",
+  BLOOD_PRESSURE: "Blood pressure Reading",
+  MORTALITY_INFORMATION: "Mortality Information of household members who passed away last year",
+  PHASE_2: "Phase- II - NCD Module",
+  TOBBACO_USE: "Tobacco use",
+  ARECA_NUT: "Areca Nut Consumption",
+  ACLOHAL_CONSUMPTION: "Alcohol Consumption",
+  DIET: "Diet",
+  PHYSICAL_ACTIVITY_WORK: "Physical Activity - Work",
+  PHYSICAL_ACTIVITY_TRAVEL: "Physical Activity - Travel to and from places",
+  PHYSICAL_ACTIVITY_RECREATIONAL: "Physical Activity - Recreational activities",
+  HISTORY_RISED_BP: "History of Raised Blood Pressure",
+  H_OF_DB: "History of Diabetes",
+  HISTORY_OF_CHOLESTEROL: "History of raised total cholesterol",
+  HISTORY_OF_C_DISEASE: "History of cardiovascular disease",
+  HEIGHT_WEIGHT: "Height and Weight",
+  WAISE_HIP_CIRCUMFERENCE: "Waist and hip circumference"
+}
 
 const FAMILY_MEMBER_METADATA_CUSTOMUPDATE = {
   DOB: 'rB3psCPmxwE',
   AGE: 'BaiVwt8jVfg',
   SEX: 'MYaNKVVYIQT',
+  NAME: "s7f3ayF0MEG",
   CONTECT_NUMBER: 'HyGJqEzbxD4',
   MEMBERSHIP_STATUS: 'cP1EanFicmA',
   TRANFER_TO: 'F6ed0skrJQw',
@@ -173,12 +205,15 @@ const FAMILY_MEMBER_METADATA_CUSTOMUPDATE = {
   HHM_2_SMOKING_FREQUENCY: 'PsY5SWSq583',
   HHM_2_SMOKED_TOBACCO_PRODUCTS: 'JYX7fyIMwrh',
   HHM_2_NCDMODULE_INDIVIDUAL: 'AMuk90nUTfs',
-  HHM2_2_AGE_OF_DEATH:'dzeTdP1U1b1',
-  HHM2_2_DATE_OF_DEATH:'McJaMbzcxAS',
+  HHM2_2_AGE_OF_DEATH: 'dzeTdP1U1b1',
+  HHM2_2_DATE_OF_DEATH: 'McJaMbzcxAS',
+  HHM_DIDSHE_PREGNENT: "VQRxvN71m5l",
 
 
   CURRENT_MARITAL_STATUS: 'ycGbZeG8LeX',
   FIRST_MARRIGE_AGE: 'LyBiqvOGFGc',
+  DOSE_NAME_HAVE: 'KrSqdwQgJoe',
+  DOSE_NAME_USE_EQUPMENT:'e0Tg69b3KDD'
 }
 
 const FAMILY_MEMBER_VALUE = {
@@ -222,5 +257,7 @@ export {
   HAS_INITIAN_NOVALUE,
   defaultProgramTrackedEntityAttributeDisable,
   MIN_MAX_TEXT,
+  NAME_REGEX,
+  MEMBER_FORM_VALIDATIONS_SECTION
 
 }

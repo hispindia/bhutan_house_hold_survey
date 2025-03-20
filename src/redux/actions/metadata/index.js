@@ -8,6 +8,7 @@ import {
   SET_ORGUNIT_GROUPS,
   SET_ORGUNIT_LEVELS,
   SET_ORGUNITS,
+  HOUSEHOLD_MEMBER_FORM_METADATA,
 } from "./type";
 
 export const setProgramMetadata = (programMetadata) => ({
@@ -70,3 +71,8 @@ export const setOrgUnits = (orgUnits) => ({
     orgUnits,
   },
 });
+
+export const houseHoldMemberFormMetaData = (formMetadata) => ({
+  type: HOUSEHOLD_MEMBER_FORM_METADATA,
+  payload: formMetadata,
+})

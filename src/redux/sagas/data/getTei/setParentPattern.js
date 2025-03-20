@@ -9,16 +9,28 @@ export function* getParentOuPatern() {
     const { selectedOrgUnit: { id: orgUnit } } = yield select((state) => state.metadata);    // handle parent nodes
     let randomNumber = Math.floor(100 + Math.random() * 900);
 
+    // function extractValues(obj) {
+    //     let values = [];
+    //     if (obj.attributeValues) {
+    //         values.push(...obj.attributeValues?.map(av => av?.value));
+    //     }
+    //     if (obj.parent) {
+    //         values.push(...extractValues(obj.parent));
+    //     }
+    //     return values;
+    // }
+
     function extractValues(obj) {
         let values = [];
-        if (obj.attributeValues) {
-            values.push(...obj.attributeValues?.map(av => av?.value));
-        }
         if (obj.parent) {
-            values.push(...extractValues(obj.parent));
+            values.push(...extractValues(obj.parent)); // Collect from parent first
+        }
+        if (obj.attributeValues) {
+            values.push(...obj.attributeValues.map(av => av?.value));
         }
         return values;
     }
+    
 
     if (offlineStatus) {
         let parent = trackedEntityManager.findOuPattern({ orgUnit });

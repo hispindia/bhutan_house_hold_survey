@@ -2,6 +2,13 @@ import { onKeyDown } from "@/utils";
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import weekday from "dayjs/plugin/weekday"; 
+import localeData from "dayjs/plugin/localeData";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
 const { TextArea } = Input;
 const { Option } = Select;
 

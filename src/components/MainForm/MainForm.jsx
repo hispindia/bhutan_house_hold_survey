@@ -5,9 +5,6 @@ import CensusDetailFormContainer from "../../containers/CensusDetailFormContaine
 import FMLayoutContainer from "../../containers/FMLayout";
 import ProfileFormContainer from "../../containers/ProfileForm";
 
-
-const { TabPane } = Tabs;
-
 const MainForm = ({
   onCloseClick,
   currentTab,
@@ -15,7 +12,7 @@ const MainForm = ({
   isEditingAttributes,
 }) => {
   const { t } = useTranslation();
- 
+
   const items = [
     {
       label: t("familyRegistration"),
@@ -23,17 +20,18 @@ const MainForm = ({
       children: <ProfileFormContainer />,
     },
     {
-      label: t("familyMembers"),
-      key: "2",
-      children: <FMLayoutContainer />,
-      disabled: isEditingAttributes,
-    },
-    {
       label: t("Household Survey"),
-      key: "3",
+      key: "2",
       children: <CensusDetailFormContainer />,
       disabled: isEditingAttributes,
     },
+    {
+      label: t("familyMembers"),
+      key: "3",
+      children: <FMLayoutContainer />,
+      disabled: isEditingAttributes,
+    },
+
   ];
 
   return (

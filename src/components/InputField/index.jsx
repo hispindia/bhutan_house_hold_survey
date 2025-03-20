@@ -1,6 +1,14 @@
 import React from "react";
 import { Input, Radio, Checkbox, DatePicker, Select } from "antd";
-import moment from "moment";
+import dayjs from "dayjs";
+import weekday from "dayjs/plugin/weekday";
+import localeData from "dayjs/plugin/localeData";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+
 import "./index.css";
 const { TextArea } = Input;
 const { Option } = Select;
@@ -20,13 +28,17 @@ const InputField = (props) => {
     disabled,
     addonAfter,
     inputRef,
+    id
   } = props;
 
+  const format = "YYYY-MM-DD";
 
+  // console.log('first', id, props)
   const generateField = () => {
     if (valueSet) {
       return (
         <Select
+          id={id}
           disabled={disabled}
           value={value}
           allowClear
@@ -43,7 +55,7 @@ const InputField = (props) => {
       );
     }
     switch (valueType) {
-      case "TEXT":
+
       case "INTEGER_POSITIVE":
       case "INTEGER_NEGATIVE":
       case "INTEGER_ZERO_OR_POSITIVE":
@@ -51,9 +63,37 @@ const InputField = (props) => {
       case "NUMBER":
       case "INTEGER":
       case "PHONE_NUMBER":
+        return (
+          <Input
+            id={id}
+            addonBefore={addonBefore}
+            addonAfter={addonAfter}
+            type='number'
+            value={value || ""}
+            onClick={click}
+            onChange={(event) => {
+              onChange(event.target.value);
+            }}
+            disabled={disabled}
+            // ref={inputRef}
+          />
+        );
+
+
+
+      case "TEXT":
+      // case "INTEGER_POSITIVE":
+      // case "INTEGER_NEGATIVE":
+      // case "INTEGER_ZERO_OR_POSITIVE":
+      // case "PERCENTAGE":
+      // case "NUMBER":
+      // case "INTEGER":
+      // case "PHONE_NUMBER":
       case "EMAIL":
         return (
           <Input
+            id={id}
+            type="text"
             addonBefore={addonBefore}
             addonAfter={addonAfter}
             value={value || ""}
@@ -62,12 +102,13 @@ const InputField = (props) => {
               onChange(event.target.value);
             }}
             disabled={disabled}
-            ref={inputRef}
+            // ref={inputRef}
           />
         );
       case "LONG_TEXT":
         return (
           <TextArea
+            id={id}
             disabled={disabled}
             value={value || ""}
             onChange={(event) => {
@@ -78,7 +119,9 @@ const InputField = (props) => {
       case "DATE":
         return (
           <DatePicker
-            value={value ? moment(value) : ""}
+            id={id}
+            // value={value ? dayjs(value) : ""}
+            defaultValue={value && dayjs(value, format).isValid() ? dayjs(value, format) : null}
             onChange={(momentObject) => {
               momentObject && onChange(momentObject.format("YYYY-MM-DD"));
             }}
@@ -87,7 +130,9 @@ const InputField = (props) => {
       case "AGE":
         return (
           <DatePicker
-            value={value ? moment(value) : ""}
+            id={id}
+            // value={value ? dayjs(value) : ""}
+            defaultValue={value && dayjs(value, format).isValid() ? dayjs(value, format) : null}
             onChange={(momentObject) => {
               onChange(momentObject);
             }}
@@ -100,6 +145,7 @@ const InputField = (props) => {
       case "BOOLEAN":
         return (
           <Radio.Group
+            id={id}
             disabled={disabled}
             value={value}
             onChange={(event) => {
@@ -117,6 +163,7 @@ const InputField = (props) => {
       case "TRUE_ONLY":
         return (
           <Checkbox
+            id={id}
             checked={value}
             onChange={(event) => {
               onChange(event.target.checked);
@@ -132,7 +179,7 @@ const InputField = (props) => {
 
   return (
     <div className="input-container">
-      {label && <div className="input-label">{label}</div>}
+      {label && <div className="input-label" >{label}</div>}
       <div className="input-field">{generateField()}</div>
       {error && <div className="input-error">{error}</div>}
       {helper && <div className="input-helper">{helper}</div>}
