@@ -439,7 +439,6 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
               >
                 <InputField
                   size="small"
-                  // onChange={(value) => handleFormData(uid, value)}
                   style={{ minWidth: '100%' }} />
               </Dhis2FormItem>
             ),
@@ -454,7 +453,7 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
                 hidden={hidden}
                 displayFormName={t("some")} id={some}>
                 <InputField
-                 value={formData[uid] || ''}
+                  value={formData[uid] || ''}
                   hidden={permanentHide == true ? true : hidden}
                   size="small" />
               </Dhis2FormItem>
@@ -464,7 +463,7 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
                 hidden={hidden}
                 displayFormName={t("alot")} id={alot}>
                 <InputField
-                 value={formData[uid] || ''}
+                  value={formData[uid] || ''}
                   hidden={permanentHide == true ? true : hidden}
                   size="small" />
               </Dhis2FormItem>
@@ -474,7 +473,7 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
                 hidden={hidden}
                 displayFormName={t(thirdRowTitle)} id={thirdRowId}>
                 <InputField
-                 value={formData[uid] || ''}
+                  value={formData[uid] || ''}
                   hidden={permanentHide == true ? true : hidden}
                   size="small" />
               </Dhis2FormItem>
@@ -532,8 +531,6 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
           </Row>
         </Col>
 
-
-
         <Col className="rightBar">
           <Tabs
             defaultActiveKey="1"
@@ -541,6 +538,18 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
             items={items}
             onChange={onTabChange}
           />
+
+          <Button
+            type="primary"
+            className="mt-2"
+            onClick={() => onSubmit(values)}
+            style={{
+              width: "10%",
+              backgroundColor: "#4CAF50",
+            }}
+          >
+            {t("save")}
+          </Button>
         </Col>
       </div>
     </Form>

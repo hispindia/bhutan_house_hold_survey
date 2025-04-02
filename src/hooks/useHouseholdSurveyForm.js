@@ -3,29 +3,42 @@ import { Form, Row } from "antd";
 import tableRenderData from '@/components/CensusDetailForm/houseServey'
 import { useSelector } from 'react-redux';
 import _ from "lodash";
+import { metadataApi } from '@/api';
 
 const useHouseholdSurveyForm = (values) => {
     const [form] = Form.useForm();
     const [surveyList, setSurveyList] = useState([])
 
-    const malariyaStrictedDelements = ['dhOvYypmAKV', 'GkBNgm5nJFM', 'PflI8FU0Rpd', 'aoQkCHSTvA2', 'uy9zZpHKaom', 'LDTBV6f9x5j', 'keBvW7IyXli']
     const hideForMaleria = ["GtSSMCc6nXz", "Ojvu6krZKBX", "WTFyAoDjI4X", "S4G690Rx8KD", "FL0F1NaV4e2", "b60lyh4IRgb", "uMRfJEDErNx", 'rWCn0WGoAeS']
 
     const selectedOuPath = useSelector((state) => state.metadata.selectedOrgUnit.path);
 
     useEffect(() => {
+        (async () => {
+            try {
+                const output = await metadataApi.getOUListForMaleria();
+                output.organisationUnits.forEach(item => {
+                    if (selectedOuPath.includes(item.id)) {
+                        tableRenderData.forEach(item => {
+                            if ((hideForMaleria.includes(item.uid))) { 
+                                item.permanentHide = false;
+                             }
+                        })
+                        return
+                    }
+                })
+                setSurveyList(_.cloneDeep(tableRenderData))
+
+            } catch (error) {
+                console.error("API Error:await metadataApi.getOUListForMaleria", error);
+            }
+        })();
+    }, []);
+
+    useEffect(() => {
         form.resetFields();
         form.setFieldsValue(values);
         // load survey fields
-
-        malariyaStrictedDelements.forEach(item => {
-            if (selectedOuPath.includes(item)) {
-                tableRenderData.forEach(item => {
-                    if ((hideForMaleria.includes(item.uid))) { item.permanentHide = false }
-                })
-                return
-            }
-        })
 
         if (values['NPb0hOBn6g9'] == 'Empty') {
             tableRenderData.forEach(item => {
@@ -105,14 +118,21 @@ const useHouseholdSurveyForm = (values) => {
                         if ((item.uid == "ySLtaPSULVN") || (item.uid == 'RIqHmgT1OWu') || (item.uid == 'rlecl6N9HcX')) { item.hidden = true }
                     })
                     values["ySLtaPSULVN"] = null;
-                } else if (ifExist.includes(value)) {
+                }
+                // else if (value == "Flush to piped sewer system") {
+                //     tableRenderData.forEach(item => {
+                //         if (item.uid == 'RIqHmgT1OWu') { item.hidden = true }
+                //     })
+                //     values["RIqHmgT1OWu"] = null;
+                // }
+                else if (ifExist.includes(value)) {
                     tableRenderData.forEach(item => {
-                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'rlecl6N9HcX')) { item.hidden = false }
+                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'rlecl6N9HcX') || (item.uid == 'RIqHmgT1OWu')) { item.hidden = false }
                     })
 
                 } else if (!ifExist.includes(value)) {
                     tableRenderData.forEach(item => {
-                        if (item.uid == "ySLtaPSULVN") { item.hidden = true }
+                        if ((item.uid == "ySLtaPSULVN") || (item.uid == 'RIqHmgT1OWu')) { item.hidden = true }
                     })
                     values["ySLtaPSULVN"] = null;
                 } else {

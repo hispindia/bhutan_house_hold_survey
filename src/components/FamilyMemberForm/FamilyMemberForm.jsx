@@ -120,6 +120,7 @@ const FamilyMemberForm = ({
     return cascadeData;
   };
 
+
   useEffect(() => {
     // load from redux
     setLoading(true);
@@ -161,6 +162,15 @@ const FamilyMemberForm = ({
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB:
         const age = calculateAge(value);
         data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE] = age;
+
+        if ((age < 15) || (age > 69)) {
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
+          // editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL, TYPE_OF_ACTION.NO, sectionKey);
+          return;
+        } else {
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = false;
+          // editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL, TYPE_OF_ACTION.YES, sectionKey);
+        }
 
         if (age > 4) {
           metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = false;
@@ -204,6 +214,7 @@ const FamilyMemberForm = ({
           metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT].hidden = false;
           metadata[MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE].hidden = false;
         }
+
         break;
 
       // handle form validation on besis of membership status
@@ -220,14 +231,19 @@ const FamilyMemberForm = ({
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION].hidden = true;
 
             // for else condition
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL].hidden = false;
+            if ((ageOfUser < 15) || (ageOfUser > 69)) {
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL].hidden = true;
+            }else{
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = false;
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL].hidden = false;
+            }
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = false;
 
             if (ageOfUser < 5) metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
             else metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = false;
 
-            
+
 
             if ((ageOfUser == 1) && (sexOfUser == TYPE_OF_ACTION.MALE)) {
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = false;
@@ -235,12 +251,9 @@ const FamilyMemberForm = ({
                 if (i == MOTHER_CHILD_CUSTOM_HIDE[4]) metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].fileds[i].hidden = false;
                 else metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].fileds[i].hidden = true;
               }
-            } 
-             editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB, data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB], sectionKey);
-             editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX, data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX], sectionKey);
-
-            // if (ageOfUser == TYPE_OF_ACTION.MALE) metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = true;
-            // else metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = false;
+            }
+            editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB, data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB], sectionKey);
+            editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX, data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX], sectionKey);
 
             if (ageOfUser < 18) {
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT].hidden = true;
@@ -251,21 +264,21 @@ const FamilyMemberForm = ({
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE].hidden = false;
             }
 
-            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE].hidden = false;
+
             // from demise
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.TOBBACO_USE].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.ARECA_NUT].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.ACLOHAL_CONSUMPTION].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.DIET].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_WORK].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_TRAVEL].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_RECREATIONAL].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_RISED_BP].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.H_OF_DB].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_CHOLESTEROL].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_C_DISEASE].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.HEIGHT_WEIGHT].hidden = false;
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.WAISE_HIP_CIRCUMFERENCE].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.TOBBACO_USE].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.ARECA_NUT].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.ACLOHAL_CONSUMPTION].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.DIET].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_WORK].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_TRAVEL].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_RECREATIONAL].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_RISED_BP].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.H_OF_DB].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_CHOLESTEROL].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_C_DISEASE].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.HEIGHT_WEIGHT].hidden = false;
+            // metadata[MEMBER_FORM_VALIDATIONS_SECTION.WAISE_HIP_CIRCUMFERENCE].hidden = false;
 
             // check other condition
             let ncdValue = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL];
@@ -313,12 +326,6 @@ const FamilyMemberForm = ({
 
           default:
 
-            // for transferd
-            // data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO] = value;
-
-            // for if 
-            // metadata[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO].hidden = false;
-
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION].hidden = true;
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
@@ -329,6 +336,7 @@ const FamilyMemberForm = ({
             // for else
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.MEMBERSHIP_STATUS].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO].hidden = false;
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL].hidden = false;
+
             // from demise
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.TOBBACO_USE].hidden = true;
@@ -399,14 +407,21 @@ const FamilyMemberForm = ({
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_42_DAYS_OF_PREGNANCY].hidden = true;
             }
 
-            if ((userAge < 40) && (userAge > 65)) {
+            if ((userAge < 40) || (userAge > 65)) {
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTED_BREAST_CANCER].hidden = true;
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_BREAST_CANCER_LASTYEAR].hidden = true;
+            }else{
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTED_BREAST_CANCER].hidden = false;
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_BREAST_CANCER_LASTYEAR].hidden = false;
             }
 
-            if ((userAge < 30) && (userAge > 65)) {
+            if ((userAge < 30) || (userAge > 65)) {
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTEDFOR_CERVICAL_CANCER].hidden = true;
               metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_CERVICAL_CANCER_LASTYEAR].hidden = true;
+            }else{
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_TESTEDFOR_CERVICAL_CANCER].hidden = false;
+              metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].fileds[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_1_LATEST_CERVICAL_CANCER_LASTYEAR].hidden = false;
+          
             }
 
             if ((userAge < 18) || (userAge > 75)) {

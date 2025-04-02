@@ -33,16 +33,6 @@ export const convertAttributesToForm = (programMetadataMember) => {
 
     const mainMetaData = convertOriginMetadata(programMetadataMember)
 
-    // if (!programSections || programSections.length === 0) {
-    //     const trackedEntityAttributes = programMetadataMember.trackedEntityAttributes.map((t) => t.id);
-    //     const TEIFormMetadata = mainMetaData.filter((f) =>
-    //         trackedEntityAttributes.includes(f.id)
-    //     );
-
-    //     // collectdAttributes.push(TEIFormMetadata);
-
-
-    // } else {
     programSections.map((pSection) => {
         const trackedEntityAttributes = pSection.trackedEntityAttributes.map((tea) => tea.id);
         const TEIFormMetadata = mainMetaData.filter((f) => trackedEntityAttributes.includes(f.id))
@@ -93,6 +83,9 @@ export const convertAttributesToForm = (programMetadataMember) => {
 
         });
     });
+
+    // manage initial hide for NCD phase || module
+    
     return collectdAttributes;
 }
 

@@ -11,6 +11,17 @@ export default class MetadataApiClass extends BaseApiClass {
       { paging: false },
       []
     );
+  getOUListForMaleria = () =>
+    pull(
+      this.baseUrl,
+      this.username,
+      this.password,
+      "/api/organisationUnitGroups/iDFMrCU1rpc.json",
+      { paging: false },
+      []
+    );
+  // https://hhs.drukhmis.gov.bt/bhutan_hhs/api/29/organisationUnitGroups/iDFMrCU1rpc.json
+
   getPrograms = () =>
     pull(
       this.baseUrl,

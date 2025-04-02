@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Modal } from "react-bootstrap";
 import BootstrapTable from "react-bootstrap-table-next";
 import { useDispatch, useSelector } from "react-redux";
-import { defaultProgramTrackedEntityAttributeDisable, FORM_ACTION_TYPES, HAS_INITIAN_NOVALUE, TYPE_OF_ACTION } from "../constants";
+import { defaultProgramTrackedEntityAttributeDisable, FORM_ACTION_TYPES, HAS_INITIAN_NOVALUE, MEMBER_FORM_VALIDATIONS_SECTION, TYPE_OF_ACTION } from "../constants";
 
 // Icon
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -322,6 +322,20 @@ const CascadeTable = (props) => {
     let modifiedForms = convertAttributesToForm(programMetadataMember);
     if (formStatus === FORM_ACTION_TYPES.EDIT) {
       modifiedForms = modifiedFormAttributesDisabledEnabled(modifiedForms, true)
+    } else if (formStatus == FORM_ACTION_TYPES.ADD_NEW) {
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.TOBBACO_USE].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.ARECA_NUT].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.ACLOHAL_CONSUMPTION].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.DIET].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_WORK].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_TRAVEL].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_RECREATIONAL].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_RISED_BP].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.H_OF_DB].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_CHOLESTEROL].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_C_DISEASE].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HEIGHT_WEIGHT].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.WAISE_HIP_CIRCUMFERENCE].hidden = true;
     }
 
     // handle fileds for previous value
