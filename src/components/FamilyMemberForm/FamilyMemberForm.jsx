@@ -165,11 +165,9 @@ const FamilyMemberForm = ({
 
         if ((age < 15) || (age > 69)) {
           metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
-          // editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL, TYPE_OF_ACTION.NO, sectionKey);
-          return;
+          // return;
         } else {
           metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = false;
-          // editRowCallback(metadata, previousData, data, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL, TYPE_OF_ACTION.YES, sectionKey);
         }
 
         if (age > 4) {

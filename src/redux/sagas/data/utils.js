@@ -299,7 +299,7 @@ export function* generateTEIDhis2Payload(payload, programMetadata) {
   programMetadata.programStages.forEach((programStage) => {
 
     let eventPayload = {
-      event: event,
+      // event: event,
       status: "COMPLETED",
       program: programMetadata.id || 'n/a',
       // program: "xvzrp56zKvI",
