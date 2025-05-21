@@ -42,6 +42,7 @@ function* initCascadeDataFromTEIsEvents(payload) {
   // );
 
   console.log("initCascadeDataFromTEIsEvents", { payload });
+  debugger;
 
   let currentCascade = {};
 
@@ -77,14 +78,15 @@ function* initCascadeDataFromTEIsEvents(payload) {
             theTEI[attr.attribute] = attr.value;
           });
 
-          const event = eventByYear?.[0];
-          if (event) {
-            event.dataValues.forEach((de) => {
+          const events = eventByYear;
+          if (events.length) {
+            events.map( event => 
+              (event.dataValues.forEach((de) => {
               const key = de.dataElement;
               const value = de.value;
 
               theTEI[key] = value;
-            });
+            })));
           }
 
           cas.push(theTEI);

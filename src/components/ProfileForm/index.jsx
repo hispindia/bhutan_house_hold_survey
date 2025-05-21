@@ -177,6 +177,25 @@ const ProfileForm = ({
           </Dhis2FormItem>
         </div>
 
+
+        <div className="col-lg-3">
+          <Dhis2FormItem
+            id="lOMK3xUwRc7"
+          // displayFormName={t("houseNumber")}
+          >
+            <InputField size="large" disabled={!isEdit} />
+          </Dhis2FormItem>
+        </div>
+
+        <div className="col-lg-3">
+          <Dhis2FormItem
+            id="dDJdN7rtIoA"
+          // displayFormName={t("houseNumber")}
+          >
+            <InputField size="large" disabled={!isEdit} />
+          </Dhis2FormItem>
+        </div>
+
       </div>
 
       <Space>
@@ -201,6 +220,8 @@ const ProfileForm = ({
                 "eMYBznRdn0t",
                 "alEL4UIuRee",
                 "WcKI8B0MYaB",
+                "lOMK3xUwRc7",
+                "dDJdN7rtIoA"
 
                 // "xbwURy2jG2K",
                 // "W8WZcI1SUjC",
