@@ -38,7 +38,9 @@ function* handleSubmitEventDataValues({ dataValues }) {
 
   // metadata
   const { programMetadataMember } = yield select((state) => state.metadata);
-
+  const memberProgramStageIDs = programMetadataMember.programStages.map(
+    (programStage) => programStage.id
+  );
   // data
   const { year, selected6Month } = yield select(
     (state) => state.data.tei.selectedYear
@@ -166,6 +168,17 @@ function* handleSubmitEventDataValues({ dataValues }) {
 
             if (eventByYear.length > 0) {
               // Generate member payload - UPDATE
+
+              const lastestEventsByYear = memberProgramStageIDs.map(
+                (programStageID) => {
+                  return eventByYear.find(
+                    (event) => event.programStage === programStageID
+                  );
+                }
+              );
+
+              console.log({ memberProgramStageIDs, lastestEventsByYear });
+
               try {
                 let updatedMemberTei = yield call(
                   generateTEIDhis2Payload,
@@ -173,6 +186,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
                     family: currentTei,
                     memberEnrollment: memberTEI.enrollments[0],
                     memberEvent: eventByYear[0],
+                    memberEvents: lastestEventsByYear,
                     memberDetails: selectedMember,
                   },
                   programMetadataMember
@@ -193,6 +207,17 @@ function* handleSubmitEventDataValues({ dataValues }) {
                   dueDate: newCurrentEvent.occurredAt,
                 };
 
+                const newEvents = memberProgramStageIDs.map(
+                  (programStageID) => {
+                    return {
+                      event: generateUid(),
+                      occurredAt: newCurrentEvent.occurredAt,
+                      dueDate: newCurrentEvent.occurredAt,
+                      programStage: programStageID,
+                    };
+                  }
+                );
+
                 // Generate member payload - UPDATE
                 let updatedMemberTei = yield call(
                   generateTEIDhis2Payload,
@@ -200,6 +225,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
                     family: currentTei,
                     memberEnrollment: memberTEI.enrollments[0],
                     memberEvent: newEvent,
+                    memberEvents: newEvents,
                     memberDetails: selectedMember,
                   },
                   programMetadataMember
@@ -224,6 +250,14 @@ function* handleSubmitEventDataValues({ dataValues }) {
               occurredAt: newCurrentEvent.occurredAt,
               dueDate: newCurrentEvent.occurredAt,
             };
+            const newEvents = memberProgramStageIDs.map((programStageID) => {
+              return {
+                event: generateUid(),
+                occurredAt: newCurrentEvent.occurredAt,
+                dueDate: newCurrentEvent.occurredAt,
+                programStage: programStageID,
+              };
+            });
 
             // Generate member payload - UPDATE
             let updatedMemberTei = yield call(
@@ -232,6 +266,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
                 family: currentTei,
                 memberEnrollment: newEnrollment,
                 memberEvent: newEvent,
+                memberEvents: newEvents,
                 memberDetails: selectedMember,
               },
               programMetadataMember
@@ -273,7 +308,14 @@ function* handleSubmitEventDataValues({ dataValues }) {
             occurredAt: newCurrentEvent.occurredAt,
             dueDate: newCurrentEvent.occurredAt,
           };
-
+          const newEvents = memberProgramStageIDs.map((programStageID) => {
+            return {
+              event: generateUid(),
+              occurredAt: newCurrentEvent.occurredAt,
+              dueDate: newCurrentEvent.occurredAt,
+              programStage: programStageID,
+            };
+          });
           // Generate member payload - UPDATE
           let updatedMemberTei = yield call(
             generateTEIDhis2Payload,
@@ -281,6 +323,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
               family: currentTei,
               memberEnrollment: newEnrollment,
               memberEvent: newEvent,
+              memberEvents: newEvents,
               memberDetails: selectedMember,
             },
             programMetadataMember
@@ -310,11 +353,11 @@ function* pushTEI(updatedMemberTei) {
   try {
     // OFFLINE MODE
     if (offlineStatus) {
-      pushTie=  yield call(trackedEntityManager.setTrackedEntityInstance, {
+      pushTie = yield call(trackedEntityManager.setTrackedEntityInstance, {
         trackedEntity: updatedMemberTei.data,
       });
     } else {
-      pushTie=  yield call(dataApi.postTrackedEntityInstances, {
+      pushTie = yield call(dataApi.postTrackedEntityInstances, {
         trackedEntities: [updatedMemberTei.data],
       });
     }
@@ -322,7 +365,7 @@ function* pushTEI(updatedMemberTei) {
   } catch (e) {
     // console.log('pushTie :>> ', pushTie);
     console.error("pushTEI", e);
-    yield put(getTeiError('Data submission failed'));
+    yield put(getTeiError("Data submission failed"));
   }
 }
 

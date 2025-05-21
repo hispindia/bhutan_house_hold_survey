@@ -211,10 +211,21 @@ const convertValueBack = (valueType, value) => {
   }
 };
 
+export function* getLastEventsByYear(currentEvents, year) {
+  const eventsByYear = getEventsByYear(currentEvents, year);
+  const lastEvent = eventsByYear[eventsByYear.length - 1];
+  const lastEvent6Month = getEventByYearAndHalt6Month(
+    currentEvents,
+    year,
+    "6month"
+  );
+  return { lastEvent, lastEvent6Month };
+}
+
 export function* generateTEIDhis2Payload(payload, programMetadata) {
-  console.log('**********:>>>', { payload, programMetadata });
-  // let { family, currentEvent, memberEvent, memberDetails, memberTEI } = payload;
-  let { family, memberEvent, memberDetails, memberEnrollment } = payload;
+  console.log("**********:>>>", { payload, programMetadata });
+  let { family, memberEvent, memberEvents, memberDetails, memberEnrollment } =
+    payload;
 
   let { orgUnit } = family;
   let { event } = memberEvent;
@@ -293,15 +304,18 @@ export function* generateTEIDhis2Payload(payload, programMetadata) {
   // };
 
   // modified event payload for multiple program stages.
-  let modifiedEventPayload = []
+  let modifiedEventPayload = [];
 
   // Loop through programStages
   programMetadata.programStages.forEach((programStage) => {
+    const eventId = memberEvents.find(
+      (event) => event.programStage === programStage.id
+    )?.event;
 
     let eventPayload = {
-      // event: event,
+      event: eventId,
       status: "COMPLETED",
-      program: programMetadata.id || 'n/a',
+      program: programMetadata.id || "n/a",
       // program: "xvzrp56zKvI",
       // programStage: "Ux1dcyOiHe7",
       programStage: programStage.id,
@@ -314,7 +328,6 @@ export function* generateTEIDhis2Payload(payload, programMetadata) {
       status: memberEvent.status,
       dataValues: [],
     };
-
 
     programStage.dataElements.forEach((de) => {
       const value = convertValueBack(de.valueType, memberDetails[de.id]);
