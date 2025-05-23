@@ -65,26 +65,30 @@ function* initExistedDataSaga() {
   const programId = yield select((state) => state.metadata.programMetadata.id);
   // console.log('teiId :>> ', teiId);
 
-  let data = {};
+  let familyTeiDate = {};
 
   // OFFLINE MODE
   if (offlineStatus) {
     // clone new data object
-    data = yield call(trackedEntityManager.getTrackedEntityInstanceById, {
-      trackedEntity: teiId,
-      program: programId,
-    });
+    familyTeiDate = yield call(
+      trackedEntityManager.getTrackedEntityInstanceById,
+      {
+        trackedEntity: teiId,
+        program: programId,
+      }
+    );
   } else {
     // get Family TEI
-    data = yield call(dataApi.getTrackedEntityInstanceById, teiId, programId);
+    familyTeiDate = yield call(
+      dataApi.getTrackedEntityInstanceById,
+      teiId,
+      programId
+    );
   }
 
-  console.log("initExistedDataSaga", { data });
+  console.log("initExistedDataSaga", { familyTeiDate });
 
-  // clone new data object
-  const teiData = JSON.parse(JSON.stringify(data));
-
-  const { orgUnit } = data;
+  const { orgUnit } = familyTeiDate;
 
   const selectedOrgUnit = yield call(getSelectedOrgUnitByOuId, orgUnit);
 
@@ -137,7 +141,7 @@ function* initExistedDataSaga() {
     throw new Error("Org Unit not found!");
   }
   yield put(setSelectedOrgUnit(selectedOrgUnit));
-  yield call(handleInitData, teiData);
+  yield call(handleInitData, JSON.parse(JSON.stringify(familyTeiDate)));
   yield call(initCascadeDataFromTEIsEvents, memberTEIsEvents);
   yield put(editingAttributes(false));
 }

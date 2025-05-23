@@ -418,11 +418,11 @@ const setEvent = async (ev) => {
       }
     }
 
-    const partitions = chunk(ids, 200);
+    // const partitions = chunk(ids, 200);
 
-    for (const partition of partitions) {
-      await db[TABLE_NAME].where("event").anyOf(partition).delete();
-    }
+    // for (const partition of partitions) {
+    //   await db[TABLE_NAME].where("event").anyOf(partition).delete();
+    // }
 
     console.log("setEvent", objects);
 

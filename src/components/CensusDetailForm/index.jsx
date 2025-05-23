@@ -12,7 +12,6 @@
 // import "./index.css";
 // import InputField from "../InputFieldCore/InputField.component";
 
-
 // const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values, }) => {
 
 //   const dataElements = useSelector((state) => state.metadata.programMetadata.programStages[0].dataElements);
@@ -149,7 +148,6 @@
 //     };
 //   };
 
-
 //   useEffect(() => { loadServeyFields() }, [])
 
 //   const dataSource = surveyList.map((row, index) => {
@@ -285,8 +283,6 @@
 //           </Row>
 //         </Col>
 
-
-
 //         <Col className="rightBar">
 //           <Tabs
 //             defaultActiveKey="1"
@@ -302,8 +298,6 @@
 
 // export default CensusDetailForm;
 
-
-
 import { Button, Col, Form, Row, Table, Tabs } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -318,18 +312,24 @@ import useHouseholdSurveyForm from "@/hooks/useHouseholdSurveyForm";
 import "./index.css";
 // import InputField from "../InputFieldCore/InputField.component";
 
+const CensusDetailForm = ({
+  onSubmit,
+  selected6Month,
+  onTabChange,
+  values,
+}) => {
+  const dataElements = useSelector(
+    (state) => state.metadata.programMetadata.programStages[0].dataElements
+  );
+  const Dhis2FormItem = useMemo(
+    () => withDhis2FormItem(dataElements)(CFormControl),
+    [dataElements]
+  );
 
-const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => {
-
-  const dataElements = useSelector((state) => state.metadata.programMetadata.programStages[0].dataElements);
-  const Dhis2FormItem = useMemo(() => withDhis2FormItem(dataElements)(CFormControl), [dataElements]);
-
-  const { form, surveyList, loadServeyFields } = useHouseholdSurveyForm(values)
+  const { form, surveyList, loadServeyFields } = useHouseholdSurveyForm(values);
 
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({})
-
-  console.log('formData', formData);
+  const [formData, setFormData] = useState({});
 
   const columns = [
     {
@@ -390,11 +390,13 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
   };
 
   const handleFormData = (id, value) => {
-    console.log('handleFormData:>>>', id, value);
+    console.log("handleFormData:>>>", id, value);
     setFormData({ ...formData, [id]: value });
-  }
+  };
 
-  useEffect(() => { loadServeyFields() }, [])
+  useEffect(() => {
+    loadServeyFields();
+  }, []);
 
   const dataSource = surveyList.map((row, index) => {
     const {
@@ -408,9 +410,9 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
       hidden,
       permanentHide,
       dependentFields = [],
-      setValuesFunc = () => { },
+      setValuesFunc = () => {},
       showFieldFunc = () => true,
-      childPropsFunc = () => { },
+      childPropsFunc = () => {},
     } = row;
     switch (type) {
       case "title": {
@@ -430,16 +432,14 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
               <Dhis2FormItem
                 noStyle
                 id={uid}
-                value={formData[uid] || ''}
+                value={formData[uid] || ""}
                 hidden={permanentHide == true ? true : hidden}
                 dependentFields={dependentFields}
                 setValuesFunc={setValuesFunc}
                 showFieldFunc={showFieldFunc}
                 childPropsFunc={childPropsFunc}
               >
-                <InputField
-                  size="small"
-                  style={{ minWidth: '100%' }} />
+                <InputField size="small" style={{ minWidth: "100%" }} />
               </Dhis2FormItem>
             ),
           };
@@ -451,38 +451,46 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
             input1: (
               <Dhis2FormItem
                 hidden={hidden}
-                displayFormName={t("some")} id={some}>
+                displayFormName={t("some")}
+                id={some}
+              >
                 <InputField
-                  value={formData[uid] || ''}
+                  value={formData[uid] || ""}
                   hidden={permanentHide == true ? true : hidden}
-                  size="small" />
+                  size="small"
+                />
               </Dhis2FormItem>
             ),
             input2: (
               <Dhis2FormItem
                 hidden={hidden}
-                displayFormName={t("alot")} id={alot}>
+                displayFormName={t("alot")}
+                id={alot}
+              >
                 <InputField
-                  value={formData[uid] || ''}
+                  value={formData[uid] || ""}
                   hidden={permanentHide == true ? true : hidden}
-                  size="small" />
+                  size="small"
+                />
               </Dhis2FormItem>
             ),
             input3: (
               <Dhis2FormItem
                 hidden={hidden}
-                displayFormName={t(thirdRowTitle)} id={thirdRowId}>
+                displayFormName={t(thirdRowTitle)}
+                id={thirdRowId}
+              >
                 <InputField
-                  value={formData[uid] || ''}
+                  value={formData[uid] || ""}
                   hidden={permanentHide == true ? true : hidden}
-                  size="small" />
+                  size="small"
+                />
               </Dhis2FormItem>
             ),
           };
         }
       }
     }
-
   });
 
   const items = [
@@ -490,7 +498,6 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
       key: 1,
       label: ``,
       children: (
-
         <Table
           size="small"
           bordered
@@ -500,7 +507,7 @@ const CensusDetailForm = ({ onSubmit, selected6Month, onTabChange, values }) => 
           columns={columns}
         />
       ),
-    }
+    },
   ];
 
   return (
