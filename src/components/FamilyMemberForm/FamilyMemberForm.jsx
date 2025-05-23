@@ -464,12 +464,17 @@ const FamilyMemberForm = ({
           MOTHER_CHILD_CUSTOM_HIDE.forEach(item => {
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].fileds[item].hidden = true;
           })
-
+          HAS_INITIAN_NOVALUE.forEach(item => {
+            metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].fileds[item].hidden = true;
+          })
         }
         else {
           // MOTHER_CHILD_SECTION.forEach(hhm2 => metadata[hhm2].hidden = false)
           // metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = false;;
           MOTHER_CHILD_CUSTOM_HIDE.forEach(item => {
+            metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].fileds[item].hidden = false;
+          })
+          HAS_INITIAN_NOVALUE.forEach(item => {
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].fileds[item].hidden = false;
           })
         }

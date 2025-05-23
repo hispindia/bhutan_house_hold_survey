@@ -341,5 +341,18 @@ export default [
     "uid": "pUnhWS1qOeS",
     "hidden": true,
     "styles": {}
+  },
+  {
+    "type": "title",
+    "name": "Remarks",
+    "hidden": false,
+    "styles": { "fontWeight": "bold" }
+  },
+  {
+    "type": "data",
+    "name": "Remarks",
+    "uid": "WXDWkfS3GhG",
+    "hidden": false,
+    "styles": {}
   }
 ]

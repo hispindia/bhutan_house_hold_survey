@@ -173,7 +173,7 @@ const eventMapping = {
 };
 const dataMapping = {
   Active: "active",
-  Transferred: "transfer-out",
+  // Transferred: "transfer-out",
   Dead: "dead",
 };
 

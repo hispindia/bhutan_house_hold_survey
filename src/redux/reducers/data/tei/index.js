@@ -81,7 +81,7 @@ const ouPattern = (state = null, { type,payload, ...agrs }) => {
   }
 };
 
-const lastYear = new Date().getFullYear() - 1;
+const lastYear = new Date().getFullYear();
 const defaultSelectedFamily = { index: 0, year: lastYear, selected6Month: 1 };
 
 const selectedYear = (state = defaultSelectedFamily, { type, ...args }) => {

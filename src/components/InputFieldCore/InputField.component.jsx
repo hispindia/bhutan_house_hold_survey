@@ -4,6 +4,9 @@ import propTypes from "./InputField.types.js";
 import { DateField, SelectField, TextField } from "./inputs/index";
 import { onKeyDown } from "@/utils";
 import { useTranslation } from "react-i18next";
+import { Input } from "antd";
+
+const {TextArea} = Input;
 
 const InputField = ({
   valueType,
@@ -119,6 +122,18 @@ const InputField = ({
             {...props}
           />
         );
+
+      case "LONG_TEXT":
+      return (
+        <TextArea
+        value={value}
+        onChange={(ev) => onChange((ev?.target?.value ?? ""))}
+        // onChange={onChange}
+        onBlur={(ev) => onBlur((ev?.target?.value ?? ""))}
+        disabled={disabled}
+          {...props}
+        />
+      );
       case "TEXT":
       case "PERCENTAGE":
       case "PHONE_NUMBER":
