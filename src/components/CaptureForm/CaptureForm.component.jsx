@@ -46,7 +46,9 @@ function CaptureForm(props) {
     compulsory: t("thisFieldIsRequired"),
   });
 
-  const formAttrMetaData = useSelector(state => state.metadata?.formMetaData || []);
+  const formAttrMetaData = useSelector(
+    (state) => state.metadata?.formMetaData || []
+  );
 
   useEffect(() => {
     initFromData(data);
@@ -59,8 +61,15 @@ function CaptureForm(props) {
     };
   }, []);
 
-  const editCall = (formAttrMetaData, prevData, formData, code, value, sectionKey) => {
-    console.log('editCall called', code, value, sectionKey)
+  const editCall = (
+    formAttrMetaData,
+    prevData,
+    formData,
+    code,
+    value,
+    sectionKey
+  ) => {
+    console.log("editCall called", code, value, sectionKey);
     let data = _.clone(formData);
 
     editRowCallback(formAttrMetaData, prevData, data, code, value, sectionKey);
@@ -71,7 +80,7 @@ function CaptureForm(props) {
     return Object.keys(formMetaData)
       .filter((f) => !formMetaData[f].hidden)
       .map((item) => {
-        let f = formMetaData[item]
+        let f = formMetaData[item];
         return (
           <div className="col-lg-3 mb-3" key={f.code}>
             <InputField
@@ -91,7 +100,6 @@ function CaptureForm(props) {
               }
               attribute={f.attribute}
               value={formData[f.code] || ""}
-
               onBlur={(value) =>
                 editCall(
                   formAttrMetaData,
@@ -113,12 +121,11 @@ function CaptureForm(props) {
               error={validation(f.code)}
               maxDate={props.maxDate}
               minDate={"1900-12-31"}
-            >
-            </InputField>
+            ></InputField>
           </div>
         );
-      })
-  }
+      });
+  };
 
   const handleCancelForm = () => {
     setFormStatus(FORM_ACTION_TYPES.NONE);
@@ -126,7 +133,6 @@ function CaptureForm(props) {
 
   const handleOnSubmit = (e, action) => {
     let status = onSubmit(null);
-    console.trace(status);
 
     if (status) {
       switch (action) {
@@ -145,7 +151,6 @@ function CaptureForm(props) {
     <>
       <div className="row">
         <div className="col-md-12">
-
           {Object.keys(formAttrMetaData)
             .filter((f) => !formAttrMetaData[f].additionCol)
             .filter((f) => !formAttrMetaData[f].hidden)
@@ -155,13 +160,14 @@ function CaptureForm(props) {
                   <div class="card-body">
                     <h5 class="card-title">{mItem}</h5>
                     <p class="card-text">
-                      <div className="row">{generateFields(formAttrMetaData[mItem].fileds, mItem)}</div>
+                      <div className="row">
+                        {generateFields(formAttrMetaData[mItem].fileds, mItem)}
+                      </div>
                     </p>
                   </div>
                 </div>
-              )
-            })
-          }
+              );
+            })}
         </div>
       </div>
 
@@ -218,9 +224,7 @@ function CaptureForm(props) {
       </div>
     </>
   );
-
-};
-
+}
 
 CaptureForm.propTypes = {};
 

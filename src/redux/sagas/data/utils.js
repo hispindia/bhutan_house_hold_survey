@@ -307,6 +307,7 @@ export function* generateTEIDhis2Payload(payload, programMetadata) {
   let modifiedEventPayload = [];
 
   // Loop through programStages
+  console.log({ memberEvents });
   programMetadata.programStages.forEach((programStage) => {
     const eventId = memberEvents.find(
       (event) => event.programStage === programStage.id

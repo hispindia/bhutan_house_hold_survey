@@ -206,9 +206,9 @@ function* handleCloneEvent({ year }) {
 
       newFamilyEvents.forEach((newFamilyEvent) => {
         if (newFamilyEvent.dataValues.length == 0) {
-          // IDz3cuoy2Ix is a the chosen dataElement for this case
+          // nI7lkHCG6tv is a the chosen dataElement for this case
           newFamilyEvent.dataValues.push({
-            dataElement: "IDz3cuoy2Ix",
+            dataElement: "nI7lkHCG6tv",
             value: "",
             dontClear: true,
           });
@@ -263,7 +263,9 @@ function* handleCloneEvent({ year }) {
 
         let updatedMemberTeis = [];
         for (let cas of cascadeDataValue) {
-          let aTEI = memberTEIsWithEvents.find((e) => e.trackedEntity == cas.id);
+          let aTEI = memberTEIsWithEvents.find(
+            (e) => e.trackedEntity == cas.id
+          );
 
           // action not allow for previous year, only next year dont use
           // if (moment(aTEI.enrollments[0].occurredAt).format('YYYY') > moment(newFamilyEvent.occurredAt).format('YYYY')) return;
@@ -302,8 +304,6 @@ function* handleCloneEvent({ year }) {
         console.log("handleCloneEvent", { newMembersTEIPayload });
 
         yield call(pushTEIs, newMembersTEIPayload);
-
-
       }
     }
   } catch (e) {

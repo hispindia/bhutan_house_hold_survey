@@ -169,13 +169,13 @@ function* handleSubmitEventDataValues({ dataValues }) {
             if (eventByYear.length > 0) {
               // Generate member payload - UPDATE
 
-              const lastestEventsByYear = memberProgramStageIDs.map(
-                (programStageID) => {
+              const lastestEventsByYear = memberProgramStageIDs
+                .map((programStageID) => {
                   return eventByYear.find(
                     (event) => event.programStage === programStageID
                   );
-                }
-              );
+                })
+                .filter(Boolean);
 
               console.log({ memberProgramStageIDs, lastestEventsByYear });
 
