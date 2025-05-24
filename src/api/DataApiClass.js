@@ -261,9 +261,11 @@ export default class DataApiClass extends BaseApiClass {
       this.password,
       `/api/organisationUnits/${id}.json`,
       { paging: false },
-      ['fields=id,displayName,attributeValues[attribute[id,displayName],value],parent[name,attributeValues[attribute[id,displayName],value],parent[id,name,attributeValues[attribute[id,displayName],value],parent[id,name,attributeValues[attribute[id,displayName],value]]]]']
+      [
+        "fields=id,displayName,attributeValues[attribute[id,displayName],value],parent[name,attributeValues[attribute[id,displayName],value],parent[id,name,attributeValues[attribute[id,displayName],value],parent[id,name,attributeValues[attribute[id,displayName],value]]]]",
+      ]
     );
-  }
+  };
 
   getTrackedEntityInstanceByQuery = (ou, filters, attributes) => {
     console.log("getTrackedEntityInstanceByQuery");

@@ -1,19 +1,19 @@
-import React, { useEffect } from "react";
-import withSkeletonLoading from "../../hocs/withSkeletonLoading";
+import { LocalStorageTab } from "@/utils/localStorageManager";
+import { Button, Space } from "antd";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory, useLocation } from "react-router";
+import { useHistory } from "react-router";
+import { compose } from "redux";
 import MainForm from "../../components/MainForm/MainForm";
+import withFeedback from "../../hocs/withFeedback";
+import withSkeletonLoading from "../../hocs/withSkeletonLoading";
+import { changeTab } from "../../redux/actions/data";
 import {
   clear,
   getTei,
   getTeiSuccessMessage,
 } from "../../redux/actions/data/tei";
 import Form from "../../skeletons/Form";
-import { changeTab } from "../../redux/actions/data";
-import { compose } from "redux";
-import withFeedback from "../../hocs/withFeedback";
-import { Button, Space } from "antd";
-import { LocalStorageTab } from "@/utils/localStorageManager";
 
 const localTab = new LocalStorageTab();
 const LoadingFormContainer = compose(
@@ -32,13 +32,11 @@ const FormContainer = () => {
   } = useSelector((state) => state.data.tei);
 
   const history = useHistory();
-  const location = useLocation();
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getTei());
     dispatch(changeTab(localTab.get()));
-    console.log('localTab.get()', localTab.get())
     return () => {
       dispatch(clear());
     };
@@ -50,7 +48,7 @@ const FormContainer = () => {
 
   const onTabChange = (tabId) => {
     dispatch(changeTab(tabId));
-    localTab.set(tabId)
+    localTab.set(tabId);
   };
 
   const backToListPage = () => {

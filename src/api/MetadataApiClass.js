@@ -144,7 +144,7 @@ export default class MetadataApiClass extends BaseApiClass {
       { paging: false },
       [
         "withinUserHierarchy=true",
-        "fields=id,code,path,children[id,code,displayName,path],displayName,level,parent,translations",
+        "fields=id,code,path,children[id,code,displayName,path],displayName,level,parent,translations,attributeValues[attribute[id,displayName],value]",
       ]
     );
   };
@@ -237,7 +237,6 @@ export default class MetadataApiClass extends BaseApiClass {
 
       localStorage.setItem("optionSets", JSON.stringify(newCacheOptions));
     }
-
 
     const programMetadata = {};
     programMetadata.id = p.id;

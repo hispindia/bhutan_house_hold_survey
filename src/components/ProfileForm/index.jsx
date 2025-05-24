@@ -122,7 +122,7 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="b4UUhQPwlRH"
-          // displayFormName={t("unitOfVillage")}
+            // displayFormName={t("unitOfVillage")}
           >
             <InputField size="large" disabled={true} />
           </Dhis2FormItem>
@@ -130,7 +130,7 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="eMYBznRdn0t"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
@@ -138,14 +138,14 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="kvCvhyGBLIi"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
 
         <div className="col-lg-3">
-          <Dhis2FormItem id="alEL4UIuRee"          >
+          <Dhis2FormItem id="alEL4UIuRee">
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
@@ -153,7 +153,7 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="WcKI8B0MYaB"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
@@ -162,7 +162,7 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="SHPW4d00NnM"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
@@ -171,17 +171,16 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="HP5XaFj6iZ7"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
 
-
-        <div className="col-lg-3">
+        {/* <div className="col-lg-3">
           <Dhis2FormItem
             id="lOMK3xUwRc7"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
@@ -190,12 +189,11 @@ const ProfileForm = ({
         <div className="col-lg-3">
           <Dhis2FormItem
             id="dDJdN7rtIoA"
-          // displayFormName={t("houseNumber")}
+            // displayFormName={t("houseNumber")}
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
-        </div>
-
+        </div> */}
       </div>
 
       <Space>
@@ -221,7 +219,7 @@ const ProfileForm = ({
                 "alEL4UIuRee",
                 "WcKI8B0MYaB",
                 "lOMK3xUwRc7",
-                "dDJdN7rtIoA"
+                "dDJdN7rtIoA",
 
                 // "xbwURy2jG2K",
                 // "W8WZcI1SUjC",

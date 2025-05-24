@@ -5,15 +5,15 @@ import moment from "moment";
 import { getParentOuPatern } from "./setParentPattern";
 
 function* handleInitNewData() {
-  yield getParentOuPatern()
-  
+  yield getParentOuPatern();
+
   const {
     selectedOrgUnit: { id: orgUnit },
     programMetadata: { id: program, trackedEntityType, programStages },
   } = yield select((state) => state.metadata);
 
   const { ouPattern } = yield select((state) => state.data.tei);
-
+  console.log({ ouPattern });
 
   const generatedTeiId = generateUid();
   const generatedEnrollmentId = generateUid();
@@ -27,7 +27,7 @@ function* handleInitNewData() {
     attributes: {
       // BUEzQEErqa7: moment().subtract(1, "y").format("YYYY"),
       BUEzQEErqa7: moment().format("YYYY"),
-      b4UUhQPwlRH: ouPattern
+      b4UUhQPwlRH: ouPattern,
     },
   };
   const currentEnrollment = {

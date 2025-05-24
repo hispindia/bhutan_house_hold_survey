@@ -1,14 +1,14 @@
-import db from "../db";
-import { get, groupBy } from "lodash";
 import { metadataApi } from "@/api";
-import { TABLE_NAME } from ".";
 import * as meManager from "@/indexDB/MeManager/MeManager";
+import { groupBy } from "lodash";
+import { TABLE_NAME } from ".";
+import db from "../db";
 
 export const pull = async () => {
   try {
     await db[TABLE_NAME].clear();
     const orgs = await metadataApi.get(`/api/organisationUnits`, {}, [
-      "filter=level:in:[1,2,3,4]&paging=false&fields=id,code,path,displayName,level,parent,translations",
+      "filter=level:in:[1,2,3,4]&paging=false&fields=id,code,path,displayName,level,translations,attributeValues[attribute[id,displayName],value],parent",
     ]);
 
     if (orgs.organisationUnits && orgs.organisationUnits.length > 0) {
@@ -17,7 +17,10 @@ export const pull = async () => {
 
     const orgsByUser = await metadataApi.getUserOrgUnits();
 
-    if (orgsByUser.organisationUnits && orgsByUser.organisationUnits.length > 0) {
+    if (
+      orgsByUser.organisationUnits &&
+      orgsByUser.organisationUnits.length > 0
+    ) {
       const addWithinUserHierarchy = orgsByUser.organisationUnits.map((org) => {
         org.withinUserHierarchy = 1;
         return org;
@@ -43,7 +46,9 @@ export const addOrgsPath = async (orgs) => {
 
 export const getUserOrgs = async () => {
   try {
-    const orgs = await db[TABLE_NAME].where("withinUserHierarchy").equals(1).toArray();
+    const orgs = await db[TABLE_NAME].where("withinUserHierarchy")
+      .equals(1)
+      .toArray();
 
     // With children
     orgs.forEach(async (org) => {
@@ -150,5 +155,26 @@ export const getOrgWithChildren = async (id) => {
     return org;
   } catch (error) {
     console.error(`Failed to get org with children`, error);
+  }
+};
+
+export const getOrgWithParentsRecursive = async ({ orgUnit }) => {
+  try {
+    const org = await db[TABLE_NAME].get({ id: orgUnit });
+
+    if (!org) {
+      return null;
+    }
+
+    const parentOrg = await db[TABLE_NAME].get({ id: org.parent?.id });
+
+    if (parentOrg) {
+      org.parent = await getOrgWithParentsRecursive({ orgUnit: parentOrg.id });
+    }
+    console.log({ [orgUnit]: org });
+
+    return org;
+  } catch (error) {
+    console.error(`Failed to get org with parents`, error);
   }
 };

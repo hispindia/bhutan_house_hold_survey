@@ -1,6 +1,6 @@
 {
-  "name": "Household Health Surveillance",
-  "short_name": "FIv2 PWA",
+  "name": "AHHS Bhutan",
+  "short_name": "AHHS Bhutan",
   "description": "Household Health Surveillance",
   "background_color": "#5a0fc8",
   "theme_color": "#5a0fc8",
@@ -51,5 +51,5 @@
   "developer": {
     "name": "HISPVN Team"
   },
-  "key": "fiv2-pwa"
+  "key": "AHHS Bhutan"
 }
