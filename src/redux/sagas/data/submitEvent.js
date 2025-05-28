@@ -176,20 +176,6 @@ function* handleCloneEvent({ year }) {
       status: "ACTIVE",
       dataValues: payloadTransformed?.dataValues || [], // payloadTransformed.dataValues,
     },
-    {
-      _isDirty: false,
-      _isCloned: true,
-      event: generateUid(),
-      trackedEntity: currentTei.trackedEntity,
-      orgUnit: selectedOrgUnit.id,
-      program: programMetadata.id,
-      programStage: "vY4mlqYfJEH",
-      enrollment: currentEnrollment.enrollment,
-      occurredAt: `${year}-12-31`,
-      dueDate: `${year}-12-31`,
-      status: "ACTIVE",
-      dataValues: payloadTransformed?.dataValues || [], // payloadTransformed.dataValues,
-    },
   ];
 
   console.log({ newFamilyEvents });
@@ -203,13 +189,18 @@ function* handleCloneEvent({ year }) {
     if (offlineStatus) {
       // create new event of family - this is used for the new Family dont have any data.
       // for offline database - event need at least 1 dataValue in order to be saved
-
+      console.log({ newFamilyEvents });
       newFamilyEvents.forEach((newFamilyEvent) => {
-        if (newFamilyEvent.dataValues.length == 0) {
+        if (
+          newFamilyEvent.dataValues.length == 0 &&
+          newFamilyEvent.dataValues.findIndex(
+            (e) => e.dataElement === "nI7lkHCG6tv"
+          ) < 0
+        ) {
           // nI7lkHCG6tv is a the chosen dataElement for this case
           newFamilyEvent.dataValues.push({
             dataElement: "nI7lkHCG6tv",
-            value: "",
+            value: "1",
             dontClear: true,
           });
         }

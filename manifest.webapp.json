@@ -1,11 +1,11 @@
 {
-  "name": "AHHS Bhutan",
-  "short_name": "AHHS Bhutan",
+  "name": "Household Health Surveillance",
+  "short_name": "Household Health Surveillance",
   "description": "Household Health Surveillance",
   "background_color": "#5a0fc8",
   "theme_color": "#5a0fc8",
   "display": "standalone",
-  "version": "1.0.65",
+  "version": "2.0.65",
   "icons": [
     {
       "src": "./assets/icon-maskable.png",
@@ -51,5 +51,5 @@
   "developer": {
     "name": "HISPVN Team"
   },
-  "key": "AHHS Bhutan"
+  "key": "Household Health Surveillance"
 }

@@ -237,7 +237,7 @@ export default class MetadataApiClass extends BaseApiClass {
 
       localStorage.setItem("optionSets", JSON.stringify(newCacheOptions));
     }
-
+    console.log({ optionSets });
     const programMetadata = {};
     programMetadata.id = p.id;
     programMetadata.organisationUnits = p.organisationUnits;
@@ -259,6 +259,7 @@ export default class MetadataApiClass extends BaseApiClass {
           disabled: false,
         };
         if (ptea.trackedEntityAttribute.optionSet) {
+          console.log({ first: ptea.trackedEntityAttribute.optionSet.id });
           tea.valueSet = optionSets.optionSets
             .find((os) => os.id === ptea.trackedEntityAttribute.optionSet.id)
             .options.map((o) => {
