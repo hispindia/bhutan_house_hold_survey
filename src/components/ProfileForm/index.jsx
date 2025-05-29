@@ -177,7 +177,7 @@ const ProfileForm = ({
           </Dhis2FormItem>
         </div>
 
-        {/* <div className="col-lg-3">
+        <div className="col-lg-3">
           <Dhis2FormItem
             id="lOMK3xUwRc7"
             // displayFormName={t("houseNumber")}
@@ -193,7 +193,7 @@ const ProfileForm = ({
           >
             <InputField size="large" disabled={!isEdit} />
           </Dhis2FormItem>
-        </div> */}
+        </div>
       </div>
 
       <Space>

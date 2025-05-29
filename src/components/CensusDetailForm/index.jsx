@@ -310,6 +310,7 @@ import useHouseholdSurveyForm from "@/hooks/useHouseholdSurveyForm";
 
 /* style */
 import "./index.css";
+import { debounce } from "lodash";
 // import InputField from "../InputFieldCore/InputField.component";
 
 const CensusDetailForm = ({
@@ -512,7 +513,7 @@ const CensusDetailForm = ({
 
   return (
     <Form
-      onFieldsChange={loadServeyFields}
+      onFieldsChange={debounce(loadServeyFields, 1000)}
       initialValues={values}
       form={form}
       onFinish={(fieldsValue) => {
