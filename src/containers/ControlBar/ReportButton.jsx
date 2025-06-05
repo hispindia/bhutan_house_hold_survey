@@ -19,13 +19,12 @@ const ReportButtonContainer = () => {
       variant="contained"
       color="primary"
       // disableElevation
-      onClick={() => {
-        history.replace(`/report`);
-      }}
+      href={`../Institution-Roster/index.html#/`}
+      target={'_blank'}
     >
-      {t("report")}
+      {t("institutionRoster")}
     </ReportButton>
   );
 };
 
-export default withOrgUnitRequired()(ReportButtonContainer);
+export default ReportButtonContainer;

@@ -1,5 +1,6 @@
 import OfflineModeButton from "@/containers/ControlBar/OfflineModeButton";
 import PushToServerButton from "@/containers/ControlBar/PushToServerButton";
+import ReportButtonContainer from "../../containers/ControlBar/ReportButton";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import HelpIcon from "@material-ui/icons/Help";
@@ -17,23 +18,23 @@ const RightSideButtons = ({
 }) => {
   const location = useLocation();
   const shouldShowExit = location.pathname !== "/form";
-
   return (
     <div className={barContainer}>
       <div className="d-none d-lg-block">
         <OfflineModeButton />
-        <PushToServerButton />
+        {/* <PushToServerButton /> */}
+        <ReportButtonContainer/>
       </div>
 
       {shouldShowExit ? (
         <>
-          <div className={helpBtn}>
+          {/* <div className={helpBtn}>
             <Tooltip title={helpLabel} placement="left">
               <IconButton size="small">
                 <HelpIcon onClick={onClickHelp} />
               </IconButton>
             </Tooltip>
-          </div>
+          </div> */}
 
           <div className={exitBtn}>
             <Button

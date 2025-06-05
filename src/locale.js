@@ -509,6 +509,7 @@ const locale = {
   appName: { en: "Family Information", lo: "ແຟ້ມຄອບຄົວ" },
   //REPORT SECTION
   report: { en: "Report", lo: "ລາຍ​ງານ​" },
+  institutionRoster: {en: 'Institution Roster', lo:"ລາຍຊື່ສະຖາບັນ"},
   years: { en: "years", lo: "ປີ" }, //MEAN AGE IN YEARS, EXAMPLE: < 1 years, 5 - 14 years, > 60 years
   gender: { en: "Gender", lo: "ເພດ" },
   total: { en: "Total", lo: "ລວມ" },

@@ -21,10 +21,6 @@ const items = [
     label: <AddNewFamilyButtonContainer />,
   },
   {
-    key: "2",
-    label: <ReportButtonContainer />,
-  },
-  {
     key: "5",
     label: <ListButtonContainer />,
   },
@@ -32,9 +28,14 @@ const items = [
     key: "3",
     label: <OfflineModeButton />,
   },
+  // {
+  //   key: "4",
+  //   label: <PushToServerButton />,
+  // },
+
   {
-    key: "4",
-    label: <PushToServerButton />,
+    key: "2",
+    label: <ReportButtonContainer />,
   },
 ];
 
@@ -67,10 +68,10 @@ const ControlBar = () => {
           <div className="mr-3 d-none d-lg-block">
             <AddNewFamilyButtonContainer />
           </div>
-
+{/* 
           <div className="mr-3 d-none d-lg-block">
             <ReportButtonContainer />
-          </div>
+          </div> */}
 
           <div className="d-none d-lg-block">
             <ListButtonContainer />
