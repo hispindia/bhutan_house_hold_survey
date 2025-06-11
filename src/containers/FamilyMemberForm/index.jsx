@@ -68,7 +68,6 @@ const FamilyMemberFormContainer = () => {
     setEventDirty(true);
   };
 
-
   return (
     <LoadingFamilyMemberForm
       loading={tei.loading}
@@ -80,7 +79,7 @@ const FamilyMemberFormContainer = () => {
       blockEntry={false}
       events={events}
       externalComponents={<div></div>}
-      setDisableCompleteBtn={() => { }}
+      setDisableCompleteBtn={() => {}}
       maxDate={maxDate}
       minDate={minDate}
     />

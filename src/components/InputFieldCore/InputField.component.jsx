@@ -6,7 +6,7 @@ import { onKeyDown } from "@/utils";
 import { useTranslation } from "react-i18next";
 import { Input } from "antd";
 
-const {TextArea} = Input;
+const { TextArea } = Input;
 
 const InputField = ({
   valueType,
@@ -124,16 +124,16 @@ const InputField = ({
         );
 
       case "LONG_TEXT":
-      return (
-        <TextArea
-        value={value}
-        onChange={(ev) => onChange((ev?.target?.value ?? ""))}
-        // onChange={onChange}
-        onBlur={(ev) => onBlur((ev?.target?.value ?? ""))}
-        disabled={disabled}
-          {...props}
-        />
-      );
+        return (
+          <TextArea
+            value={value}
+            onChange={(ev) => onChange(ev?.target?.value ?? "")}
+            // onChange={onChange}
+            onBlur={(ev) => onBlur(ev?.target?.value ?? "")}
+            disabled={disabled}
+            {...props}
+          />
+        );
       case "TEXT":
       case "PERCENTAGE":
       case "PHONE_NUMBER":
@@ -215,7 +215,10 @@ const InputField = ({
   };
 
   return (
-    <div className="input-field-container">
+    <div
+      className="input-field-container"
+      data-element-id={props["data-element-id"]}
+    >
       {label && <div className="input-field-label">{label}</div>}
       <div className="h-10">{generateInput()}</div>
       {warning && <div className="input-field-warning">{warning}</div>}

@@ -121,6 +121,7 @@ function CaptureForm(props) {
               error={validation(f.code)}
               maxDate={props.maxDate}
               minDate={"1900-12-31"}
+              data-element-id={f.code}
             ></InputField>
           </div>
         );

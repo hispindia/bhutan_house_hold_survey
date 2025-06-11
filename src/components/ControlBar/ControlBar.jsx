@@ -68,7 +68,7 @@ const ControlBar = () => {
           <div className="mr-3 d-none d-lg-block">
             <AddNewFamilyButtonContainer />
           </div>
-{/* 
+          {/* 
           <div className="mr-3 d-none d-lg-block">
             <ReportButtonContainer />
           </div> */}

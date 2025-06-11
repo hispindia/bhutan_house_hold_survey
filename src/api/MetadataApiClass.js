@@ -259,7 +259,6 @@ export default class MetadataApiClass extends BaseApiClass {
           disabled: false,
         };
         if (ptea.trackedEntityAttribute.optionSet) {
-          console.log({ first: ptea.trackedEntityAttribute.optionSet.id });
           tea.valueSet = optionSets.optionSets
             .find((os) => os.id === ptea.trackedEntityAttribute.optionSet.id)
             .options.map((o) => {
