@@ -84,10 +84,12 @@ const PushToServerButton = () => {
       >
         {t("push")}
       </Button>
+
       <Button
         onClick={exportExcel}
         style={{
           marginRight: "10px",
+          marginTop: "5px",
           backgroundColor: blue[5],
         }}
         shape="round"
@@ -97,7 +99,6 @@ const PushToServerButton = () => {
       >
         {t("exportExcel")}
       </Button>
-
       <ExcelImportButton />
     </>
   );

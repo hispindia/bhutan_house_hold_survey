@@ -6,6 +6,7 @@ import * as meManager from "@/indexDB/MeManager/MeManager";
 import moment from "moment";
 import { chunk } from "lodash";
 import { toDhis2Events } from "../data/event";
+import { LAST_DATE_OF_CURRENT_YEAR } from "../constants";
 
 export const getEventsRawData = async (pager, org, program) => {
   return await dataApi.get(
@@ -58,7 +59,7 @@ export const getEventsAnalyticsTable = async (pager, org, program) => {
       `dimension=ou:${org.id}`,
       `ouMode=DESCENDANTS`,
       `startDate=2018-01-01`,
-      `endDate=${moment().format("YYYY-MM-DD")}`,
+      `endDate=${LAST_DATE_OF_CURRENT_YEAR}`,
       // `dimension=dx:${dataElementIds.map((de) => de).join(';')}`,
       dataElementIds.map((de) => `dimension=${de}`).join("&"),
     ]

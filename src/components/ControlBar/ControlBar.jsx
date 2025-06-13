@@ -28,11 +28,10 @@ const items = [
     key: "3",
     label: <OfflineModeButton />,
   },
-  // {
-  //   key: "4",
-  //   label: <PushToServerButton />,
-  // },
-
+  {
+    key: "4",
+    label: <PushToServerButton />,
+  },
   {
     key: "2",
     label: <ReportButtonContainer />,

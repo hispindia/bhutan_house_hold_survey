@@ -109,15 +109,15 @@ function* initExistedDataSaga() {
       Object.entries(teiMapping).map((e) => e[1]),
       `xvzrp56zKvI`
     );
-
-    console.log({ memberTEIs });
   }
+  console.log({ memberTEIs, teiId });
 
   // const headerIndexes = yield call(getHeaderIndexes, memberTEIs);
   const memberTEIsUid = memberTEIs.instances.map((tei) => tei.trackedEntity);
 
   // get by event query
   let memberTEIsEvents = null;
+  console.log({ memberTEIsUid });
 
   if (memberTEIsUid && memberTEIsUid.length > 0) {
     if (offlineStatus) {
@@ -136,6 +136,8 @@ function* initExistedDataSaga() {
       );
     }
   }
+
+  console.log({ memberTEIsUid, memberTEIsEvents });
 
   if (!selectedOrgUnit) {
     throw new Error("Org Unit not found!");

@@ -237,7 +237,7 @@ export default class MetadataApiClass extends BaseApiClass {
 
       localStorage.setItem("optionSets", JSON.stringify(newCacheOptions));
     }
-    console.log({ optionSets });
+
     const programMetadata = {};
     programMetadata.id = p.id;
     programMetadata.organisationUnits = p.organisationUnits;

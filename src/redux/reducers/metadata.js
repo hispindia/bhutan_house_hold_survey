@@ -24,7 +24,7 @@ const initialState = {
   minDate: "2021-01-01",
   maxDate: moment().endOf("year").format("YYYY-MM-DD"),
   immutableYear: [2018, 2019],
-  formMetaData:{}
+  formMetaData: {},
   // subtract(1, "years")
 };
 

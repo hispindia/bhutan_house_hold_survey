@@ -1,11 +1,10 @@
-import db from "../db";
-import { TABLE_NAME } from ".";
 import { dataApi } from "@/api";
 import * as programManager from "@/indexDB/ProgramManager/ProgramManager";
-import * as meManager from "@/indexDB/MeManager/MeManager";
-import moment from "moment";
-import { toDhis2Enrollments } from "../data/enrollment";
 import { chunk } from "lodash";
+import moment from "moment";
+import { TABLE_NAME } from ".";
+import { toDhis2Enrollments } from "../data/enrollment";
+import db from "../db";
 
 export const pull = async ({
   handleDispatchCurrentOfflineLoading,
@@ -54,7 +53,7 @@ export const pull = async ({
                   "incidentDate",
                   "followup",
                 ].join(",")}`,
-              ],
+              ]
             );
 
             if (
@@ -66,7 +65,7 @@ export const pull = async ({
             }
 
             console.log(
-              `ENROLLMENT = ${program.id} (page=${page}/${result.pageCount}, count=${result.instances.length})`,
+              `ENROLLMENT = ${program.id} (page=${page}/${result.pageCount}, count=${result.instances.length})`
             );
 
             const resultEnrollments = {
