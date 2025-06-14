@@ -75,7 +75,15 @@ function* handleOfflineStatusChange({ offlineStatus }) {
   localStorage.setItem("offlineStatus", offlineStatus);
 
   if (!offlineStatus) {
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload();
+      notification.success({
+        message: "Success",
+        description: "Data has been synced to server successfully!",
+        placement: "bottomRight",
+        duration: 3,
+      });
+    }, 3000); // wait for 1 second before reloading
   }
 }
 

@@ -243,6 +243,11 @@ export function* generateTEIDhis2Payload(payload, programMetadata) {
   };
 
   programMetadata.trackedEntityAttributes.forEach((attr) => {
+    if (attr.id === "gv9xX5w4kKt") {
+      // Skip the family TEI attribute, it will be added later
+      return;
+    }
+
     tei.attributes.push({
       attribute: attr.id,
       value: convertValueBack(attr.valueType, memberDetails[attr.id]),

@@ -69,7 +69,6 @@ function CaptureForm(props) {
     value,
     sectionKey
   ) => {
-    console.log("editCall called", code, value, sectionKey);
     let data = _.clone(formData);
 
     editRowCallback(formAttrMetaData, prevData, data, code, value, sectionKey);

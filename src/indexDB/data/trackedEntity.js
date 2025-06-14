@@ -27,13 +27,17 @@ const toDhis2Tei = (trackedEntity, teiData, enrs = []) => {
   };
 };
 
-const cleanDuplicateAttributes = (attributes) => {};
-
 export const toDhis2TrackedEntities = (teis) => {
   if (!teis) return [];
 
-  const cleanedTeis = _.uniqBy(teis, (e) => e.trackedEntity + e.attribute);
+  //  clean up duplicate tracked entities with same attribute and get which has value
+  const cleanedTeis = _.uniqBy(
+    teis,
+    (e) => `${e.trackedEntity}-${e.attribute}-${e.value}`
+  ).filter((e) => e.value);
   let resTEIS = _.groupBy(cleanedTeis, "trackedEntity");
+
+  console.log({ resTEIS, teis });
 
   return Object.entries(resTEIS).map(([trackedEntity, teiData]) =>
     toDhis2Tei(trackedEntity, teiData)
