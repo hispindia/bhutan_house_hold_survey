@@ -255,6 +255,24 @@ const findHeaderIndex = (headers, name) => {
   return headers.findIndex((header) => header.name === name);
 };
 
+const findHeader = (headers, name) => {
+  const header = headers.find((header) => header.name === name);
+  if (!header) {
+    throw new Error(`Header ${name} not found`);
+  }
+  return header;
+};
+
+const convertValue = (metadata, datavalue) => {
+  switch (metadata.valueType) {
+    case "BOOLEAN":
+      return datavalue === "1" ? "true" : "false";
+
+    default:
+      return datavalue;
+  }
+};
+
 export const getEventsByQuery = async ({
   program,
   programStage,
@@ -345,12 +363,13 @@ const beforePersistAnalyticsData = async (result, program) => {
     ids.push(event.event);
 
     for (const de of dataElementIds) {
+      const metadataHeader = findHeader(result.headers, de);
       const dataValue = ev[findHeaderIndex(result.headers, de)];
 
       if (dataValue) {
         const value = Object.assign({}, event, {
           dataElement: de,
-          value: ev[findHeaderIndex(result.headers, de)],
+          value: convertValue(metadataHeader, dataValue),
           isProvidedElsewhere: 0, // dv.providedElsewhere || false,
         });
 
