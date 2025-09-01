@@ -9,6 +9,7 @@ import "typeface-roboto";
 import AppContainer from "./containers/App/App";
 import "./index.css";
 import locale from "./locale";
+import "leaflet/dist/leaflet.css";
 
 import { Provider } from "react-redux";
 import configureStore, { history, mainStore } from "./redux/store";

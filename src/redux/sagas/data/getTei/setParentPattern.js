@@ -8,7 +8,8 @@ export function* getParentOuPatern() {
   const {
     selectedOrgUnit: { id: orgUnit },
   } = yield select((state) => state.metadata); // handle parent nodes
-  let randomNumber = Math.floor(100 + Math.random() * 900);
+let randomNumber = Math.floor(100000 + Math.random() * 900000);
+
 
   // function extractValues(obj) {
   //     let values = [];

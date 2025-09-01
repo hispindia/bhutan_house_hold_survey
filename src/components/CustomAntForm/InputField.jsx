@@ -166,6 +166,22 @@ const InputField = ({
       console.log("onChange", props.onChange);
       return null;
     }
+     case "COORDINATE": {
+
+      console.log("tttttttttttt",props );
+       const coordinates = props.value;
+      return (
+           <Input
+            // type="text"
+            // className="w-full border rounded-lg p-2 pr-10"
+          //   placeholder={t("selectCoordinates")}
+          //  value={coordinates ? `${coordinates[0]}, ${coordinates[1]}` : ""}
+            {...props}
+            // readOnly
+          /> 
+      );
+    }
+   
     default:
       return <span>UNSUPPORTED VALUE TYPE</span>;
   }

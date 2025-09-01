@@ -4,6 +4,7 @@ import InputField from "../components/InputField";
 import { DatePicker, Input, Select } from "antd";
 import { useTranslation } from "react-i18next";
 
+
 const { Option } = Select;
 const { Search } = Input;
 
@@ -40,6 +41,7 @@ export const convertValue = (valueType, value) => {
     case "PHONE_NUMBER":
     case "EMAIL":
     case "LONG_TEXT":
+       case "COORDINATE":
       return value;
     case "DATE":
       return moment(value).format("YYYY-MM-DD");

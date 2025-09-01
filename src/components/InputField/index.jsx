@@ -3,7 +3,7 @@ import { Input, Radio, Checkbox, DatePicker, Select } from "antd";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(weekday);
@@ -28,7 +28,7 @@ const InputField = (props) => {
     disabled,
     addonAfter,
     inputRef,
-    id
+    id,
   } = props;
 
   const format = "YYYY-MM-DD";
@@ -55,7 +55,6 @@ const InputField = (props) => {
       );
     }
     switch (valueType) {
-
       case "INTEGER_POSITIVE":
       case "INTEGER_NEGATIVE":
       case "INTEGER_ZERO_OR_POSITIVE":
@@ -68,7 +67,7 @@ const InputField = (props) => {
             id={id}
             addonBefore={addonBefore}
             addonAfter={addonAfter}
-            type='number'
+            type="number"
             value={value || ""}
             onClick={click}
             onChange={(event) => {
@@ -79,9 +78,8 @@ const InputField = (props) => {
           />
         );
 
-
-
       case "TEXT":
+
       // case "INTEGER_POSITIVE":
       // case "INTEGER_NEGATIVE":
       // case "INTEGER_ZERO_OR_POSITIVE":
@@ -121,7 +119,11 @@ const InputField = (props) => {
           <DatePicker
             id={id}
             // value={value ? dayjs(value) : ""}
-            defaultValue={value && dayjs(value, format).isValid() ? dayjs(value, format) : null}
+            defaultValue={
+              value && dayjs(value, format).isValid()
+                ? dayjs(value, format)
+                : null
+            }
             onChange={(momentObject) => {
               momentObject && onChange(momentObject.format("YYYY-MM-DD"));
             }}
@@ -132,7 +134,11 @@ const InputField = (props) => {
           <DatePicker
             id={id}
             // value={value ? dayjs(value) : ""}
-            defaultValue={value && dayjs(value, format).isValid() ? dayjs(value, format) : null}
+            defaultValue={
+              value && dayjs(value, format).isValid()
+                ? dayjs(value, format)
+                : null
+            }
             onChange={(momentObject) => {
               onChange(momentObject);
             }}
@@ -171,6 +177,24 @@ const InputField = (props) => {
             disabled={disabled}
           ></Checkbox>
         );
+      case "COORDINATE": {
+        return (
+          <input
+            // type="text"
+            // className="w-full border rounded-lg p-2 pr-10"
+            id={id}
+            type="text"
+            addonBefore={addonBefore}
+            addonAfter={addonAfter}
+            value={value || ""}
+            onClick={click}
+            onChange={(event) => {
+              onChange(event.target.value);
+            }}
+            disabled={disabled}
+          />
+        );
+      }
 
       default:
         return <span>UNSUPPORTED VALUE TYPE</span>;
@@ -179,7 +203,7 @@ const InputField = (props) => {
 
   return (
     <div className="input-container">
-      {label && <div className="input-label" >{label}</div>}
+      {label && <div className="input-label">{label}</div>}
       <div className="input-field">{generateField()}</div>
       {error && <div className="input-error">{error}</div>}
       {helper && <div className="input-helper">{helper}</div>}
