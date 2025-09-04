@@ -140,7 +140,8 @@ const InputField = ({
       case "EMAIL":
          case "COORDINATE":
         return (
-          <TextField
+          <Input
+          type="text"
             value={value}
             handleChange={onChange}
             handleBlur={onBlur}
@@ -174,21 +175,7 @@ const InputField = ({
             {...props}
           />
         );
-         case "COORDINATE": {
-
-      console.log("tttttttttttt",props );
-       const coordinates = props.value;
-      return (
-           <input
-            // type="text"
-            // className="w-full border rounded-lg p-2 pr-10"
-            placeholder={t("selectCoordinates")}
-           value={coordinates ? `${coordinates[0]}, ${coordinates[1]}` : ""}
-            // {...props}
-            readOnly
-          /> 
-      );
-    }
+        
       case "PATTERNNUMBER":
         return (
           <TextField

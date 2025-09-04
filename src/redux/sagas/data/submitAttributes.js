@@ -20,7 +20,6 @@ import * as enrollmentManager from "@/indexDB/EnrollmentManager/EnrollmentManage
 
 function* handleSubmitAttributes({ attributes }) {
   yield put(loadTei(true));
-
   const teiId = yield call(getTeiId);
 
   const { currentTei, currentEnrollment } = yield call(makePayload, attributes);
@@ -68,6 +67,7 @@ function* handleSubmitAttributes({ attributes }) {
 }
 
 function* makePayload(attributes) {
+  debugger
   const data = yield select((state) => state.data.tei.data);
   const programMetadata = yield select(
     (state) => state.metadata.programMetadata

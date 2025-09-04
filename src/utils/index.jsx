@@ -15,6 +15,18 @@ const sample = (d, fn = Math.random) => {
   return d[Math.round(fn() * (d.length - 1))];
 };
 
+export const getLocation =()=>{
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        resolve(`[${pos.coords.latitude}, ${pos.coords.longitude}]`);
+      },
+      (error) => reject(error)
+    );
+  });
+}
+
+
 export const generateUid = (limit = 11, fn = Math.random) => {
   const allowedLetters = [
     "abcdefghijklmnopqrstuvwxyz",
@@ -72,6 +84,7 @@ export const convertValueBack = (valueType, value) => {
     case "PHONE_NUMBER":
     case "EMAIL":
     case "LONG_TEXT":
+    case "COORDINATE":
       return value;
     case "DATE":
       return moment(value).format("YYYY-MM-DD");

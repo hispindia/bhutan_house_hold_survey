@@ -15,15 +15,7 @@ import withDhis2FormItem from "../../hocs/withDhis2Field";
 import CFormControl from "../CustomAntForm/CFormControl";
 import InputField from "../CustomAntForm/InputField";
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import L from "leaflet";
 
-import { MapPin } from "lucide-react";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-// import Search from "react-leaflet-search";
 const ProfileForm = ({
   onSubmit,
   isEditingAttributes: isEdit,
@@ -43,6 +35,8 @@ const ProfileForm = ({
     },
   } = useSelector((state) => state.metadata);
   const profile = useSelector((state) => state.data.tei.data.currentTei);
+
+
   const Dhis2FormItem = useMemo(
     () => withDhis2FormItem(trackedEntityAttributes)(CFormControl),
     []
@@ -51,44 +45,7 @@ const ProfileForm = ({
   const randomNumber = useMemo(() => {
     return Math.floor(1000 + Math.random() * 9000);
   }, []);
-  //add map
-
-  // Fix default marker issue in Leaflet
-  const markerIcon = new L.Icon({
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-  });
-
-  const [coordinates, setCoordinates] = useState(null);
-  const [open, setOpen] = React.useState(false);
-  function LocationMarker({ setCoordinates, closeDialog }) {
-    useMapEvents({
-      click(e) {
-        setCoordinates([e.latlng.lat, e.latlng.lng]);
-        closeDialog(); // Close dialog after selecting location
-      },
-    });
-    return null;
-  }
-
-  // Get live location on mount
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setCoordinates(`[${pos.coords.latitude}, ${pos.coords.longitude}]`);
-        },
-        (err) => {
-          console.error("Geolocation error:", err);
-        }
-      );
-    }
-  }, []);
-
-  //add map
-
+  
   const handleGenerateTemporaryBookNumber = ([
     residenceStatus,
     unitOfVillage,
@@ -211,63 +168,7 @@ const ProfileForm = ({
             id="SHPW4d00NnM"
             // displayFormName={t("houseNumber")}
           >
-             <InputField size="large"  disabled={!isEdit} />
-            {/* <div className="flex flex-col gap-3 w-full max-w-md"> */}
-              {/* Input with map icon */}
-              {/* <div className="relative flex items-center"> */}
-                {/* <InputField
-                size="large"
-                  valueType="COORDINATE"
-                  value={coordinates}
-                  onChange={setCoordinates}
-                  disabled={true}
-
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 text-blue-600"
-                  onClick={() => setOpen(true)}
-                >
-                  <MapPin size={22} />
-                </button> */}
-              {/* </div> */}
-
-              {/* Dialog with map */}
-              {/* <Dialog
-                open={open}
-                onClose={() => setOpen(false)}
-                PaperProps={{
-                  style: {
-                    borderRadius: 16,
-                    padding: "0",
-                    height: "80%",
-                    width: "80%",
-                  },
-                }}
-              >
-                <DialogTitle>Select Location</DialogTitle>
-                <DialogContent sx={{ height: "500px", p: 0 }}>
-                  {coordinates && (
-                    <MapContainer
-                      center={coordinates}
-                      zoom={13}
-                      style={{ height: "100%", width: "100%" }}
-                    >
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution="&copy; OpenStreetMap contributors"
-                      />
-                      <Marker position={coordinates} icon={markerIcon} />
-                      <LocationMarker
-                        setCoordinates={setCoordinates}
-                        closeDialog={() => setOpen(false)}
-                      />
-                    </MapContainer>
-                  )}
-                </DialogContent>
-              </Dialog> */}
-            {/* </div> */}
-            {/* <InputField size="large" disabled={!isEdit} /> */}
+             <InputField  size="large"  disabled={!isEdit} />
           </Dhis2FormItem>
         </div>
 

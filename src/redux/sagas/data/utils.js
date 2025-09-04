@@ -194,7 +194,7 @@ const convertValueBack = (valueType, value) => {
     case "EMAIL":
     case "LONG_TEXT":
        case "COORDINATE":
-      return dataMapping.hasOwnProperty(value) ? dataMapping[value] : value;
+       return value ? value + "" : "";
     case "DATE":
       return value ? moment(value).format("YYYY-MM-DD") : value;
     case "DATETIME":
