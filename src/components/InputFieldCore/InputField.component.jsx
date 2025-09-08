@@ -138,13 +138,15 @@ const InputField = ({
       case "PERCENTAGE":
       case "PHONE_NUMBER":
       case "EMAIL":
-         case "COORDINATE":
+      case "COORDINATE":
         return (
           <Input
-          type="text"
+            type="text"
             value={value}
-            handleChange={onChange}
-            handleBlur={onBlur}
+            // handleChange={onChange}
+            // handleBlur={onBlur}
+            onChange={(ev) => onChange(ev?.target?.value ?? "")}
+            onBlur={(ev) => onBlur(ev?.target?.value ?? "")}
             disabled={disabled}
             {...props}
           />
@@ -175,7 +177,7 @@ const InputField = ({
             {...props}
           />
         );
-        
+
       case "PATTERNNUMBER":
         return (
           <TextField
