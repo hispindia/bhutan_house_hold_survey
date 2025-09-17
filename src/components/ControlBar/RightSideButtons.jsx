@@ -7,6 +7,7 @@ import HelpIcon from "@material-ui/icons/Help";
 import { Button } from "antd";
 import { useLocation } from "react-router";
 import styles from "./ControlBar.module.css";
+import manifest from "../../../manifest.webapp.json";
 
 const { exitBtn, helpBtn, barContainer } = styles;
 
@@ -24,6 +25,9 @@ const RightSideButtons = ({
         <OfflineModeButton />
         <PushToServerButton />
         <ReportButtonContainer />
+         <div className="d-flex align-items-center">
+          <span className="text-muted font-medium">v{manifest.version}</span>
+        </div>
       </div>
 
       {shouldShowExit ? (

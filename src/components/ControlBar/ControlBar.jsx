@@ -12,6 +12,8 @@ import RightSideButtonsContainer from "../../containers/ControlBar/RightSideButt
 import OfflineModeButton from "@/containers/ControlBar/OfflineModeButton";
 import PushToServerButton from "@/containers/ControlBar/PushToServerButton";
 import ListButtonContainer from "@/containers/ControlBar/ListButton";
+import manifest from "../../../manifest.webapp.json";
+
 
 const { controlBarContainer } = styles;
 
@@ -35,6 +37,14 @@ const items = [
   {
     key: "2",
     label: <ReportButtonContainer />,
+  },
+   {
+    key: "6",
+    label: (
+      <div className="d-flex align-items-center">
+        <span className="text-muted font-medium">v{manifest.version}</span>
+      </div>
+    ),
   },
 ];
 

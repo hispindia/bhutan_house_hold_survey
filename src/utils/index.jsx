@@ -19,7 +19,7 @@ export const getLocation =()=>{
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        resolve(`[${pos.coords.latitude}, ${pos.coords.longitude}]`);
+        resolve(`[${pos.coords.longitude}, ${pos.coords.latitude}]`);
       },
       (error) => reject(error)
     );
