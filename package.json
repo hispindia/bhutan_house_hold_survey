@@ -1,13 +1,17 @@
 {
   "name": "vite-pwa-fi",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/bump-version.js",
     "build": "cross-env VITE_MODE=production VITE_BASE_URL=../../.. VITE_USERNAME= VITE_PASSWORD= vite build",
     "preview": "vite preview",
     "postbuild": "node postbuild.js && cd dist && bestzip pwa_dhis2.zip *",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/logo.svg"
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/logo.svg",
+    "bump:patch": "node scripts/bump-version.js patch",
+    "bump:minor": "node scripts/bump-version.js minor",
+    "bump:major": "node scripts/bump-version.js major"
   },
   "dependencies": {
     "@dhis2/ui-widgets": "^6.24.0",
@@ -112,6 +116,7 @@
     "vite": "^3.2.5",
     "vite-plugin-pwa": "^0.19.7",
     "webpack-cli": "^5.1.4",
-    "workbox-core": "^7.1.0"
+    "workbox-core": "^7.1.0",
+    "workbox-window": "^7.3.0"
   }
 }
