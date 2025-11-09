@@ -199,7 +199,7 @@ const PushModal = ({
       onCancel={onCancel}
       onOk={handleSyncClick}
       okText={getButtonText()}
-      okButtonProps={{ disabled: isDisabled && !isSuperuser }}
+      okButtonProps={{ disabled: false /*isDisabled*/ && !isSuperuser }}
     >
       {pushMapping.map(({ label, id }, step) => {
         // Use individual progress for each operation
