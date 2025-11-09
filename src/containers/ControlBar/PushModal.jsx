@@ -16,15 +16,7 @@ export const pushMapping = [
 const SYNC_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes in milliseconds
 const STORAGE_KEY = "syncTime";
 
-const PushModal = ({
-  pushData,
-  open,
-  onCancel,
-  onOk,
-  onClose,
-  syncError,
-  syncCompleted,
-}) => {
+const PushModal = ({ pushData, open, onCancel, onOk, onClose, syncError, syncCompleted }) => {
   const { isSuperuser } = useUser();
   const { t } = useTranslation();
   const { currentOfflineLoading } = useSelector((state) => state.common);
@@ -43,10 +35,7 @@ const PushModal = ({
 
   // Update individual progress when currentOfflineLoading changes
   useEffect(() => {
-    if (
-      currentOfflineLoading.id &&
-      currentOfflineLoading.percent !== undefined
-    ) {
+    if (currentOfflineLoading.id && currentOfflineLoading.percent !== undefined) {
       setIndividualProgress((prev) => ({
         ...prev,
         [currentOfflineLoading.id]: currentOfflineLoading.percent,
@@ -82,9 +71,7 @@ const PushModal = ({
       return { isOnCooldown: false, remainingTime: 0 };
     } else {
       // Still on cooldown
-      const remainingTime = Math.ceil(
-        (SYNC_COOLDOWN_MS - timeDifference) / 1000
-      );
+      const remainingTime = Math.ceil((SYNC_COOLDOWN_MS - timeDifference) / 1000);
       return { isOnCooldown: true, remainingTime };
     }
   };
@@ -199,7 +186,7 @@ const PushModal = ({
       onCancel={onCancel}
       onOk={handleSyncClick}
       okText={getButtonText()}
-      okButtonProps={{ disabled: false /*isDisabled*/ && !isSuperuser }}
+      okButtonProps={{ disabled: isDisabled && !isSuperuser }}
     >
       {pushMapping.map(({ label, id }, step) => {
         // Use individual progress for each operation

@@ -4,7 +4,6 @@ import InputField from "../components/InputField";
 import { DatePicker, Input, Select } from "antd";
 import { useTranslation } from "react-i18next";
 
-
 const { Option } = Select;
 const { Search } = Input;
 
@@ -15,7 +14,7 @@ const sample = (d, fn = Math.random) => {
   return d[Math.round(fn() * (d.length - 1))];
 };
 
-export const getLocation =()=>{
+export const getLocation = () => {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -24,14 +23,10 @@ export const getLocation =()=>{
       (error) => reject(error)
     );
   });
-}
-
+};
 
 export const generateUid = (limit = 11, fn = Math.random) => {
-  const allowedLetters = [
-    "abcdefghijklmnopqrstuvwxyz",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  ].join("");
+  const allowedLetters = ["abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"].join("");
   const allowedChars = ["0123456789", allowedLetters].join("");
   const arr = [sample(allowedLetters, fn)];
   for (let i = 0; i < limit - 1; i++) {
@@ -53,7 +48,7 @@ export const convertValue = (valueType, value) => {
     case "PHONE_NUMBER":
     case "EMAIL":
     case "LONG_TEXT":
-       case "COORDINATE":
+    case "COORDINATE":
       return value;
     case "DATE":
       return moment(value).format("YYYY-MM-DD");
@@ -79,72 +74,59 @@ export const convertValueBack = (valueType, value) => {
     case "INTEGER_NEGATIVE":
     case "INTEGER_ZERO_OR_POSITIVE":
     case "PERCENTAGE":
-    case "NUMBER":
-    case "INTEGER":
     case "PHONE_NUMBER":
     case "EMAIL":
     case "LONG_TEXT":
     case "COORDINATE":
       return value;
+    case "NUMBER":
+    case "INTEGER":
+      return Number(value);
     case "DATE":
-      return moment(value).format("YYYY-MM-DD");
-    case "DATETIME":
-      return moment(value);
-    case "TIME":
-      return moment(value);
-    case "BOOLEAN":
-      return value + "";
-    case "TRUE_ONLY":
-      return value ? value + "" : "";
     case "AGE":
-      return moment(value).format("YYYY-MM-DD");
+      return isValidDate(value) ? moment(value, "YYYY-MM-DD").format("YYYY-MM-DD") : "";
+    case "DATETIME":
+    case "TIME":
+      return isValidDate(value) ? moment(value).format("YYYY-MM-DD") : "";
+    case "BOOLEAN":
+      return value ? value + "" : "";
+    case "TRUE_ONLY":
+      // Convert 1 to "true", 0 to empty string for TRUE_ONLY fields
+      if (value === "1" || value === 1 || value === "true") {
+        return "true";
+      } else if (value === "0" || value === 0 || value === "" || value === null || value === undefined) {
+        return "";
+      }
+      return value ? value + "" : "";
     default:
-      return <span>UNSUPPORTED VALUE TYPE</span>;
+      return value;
   }
 };
 
 export const generateDhis2Payload = (data, programMetadata) => {
   const newData = JSON.parse(JSON.stringify(data));
   let { currentTei, currentEnrollment, currentEvents } = newData;
-  currentTei.attributes = Object.keys(currentTei.attributes).map(
-    (attribute) => {
-      const attributeMetadata = programMetadata.trackedEntityAttributes.find(
-        (attr) => attr.id === attribute
-      );
-      return {
-        attribute,
-        value: convertValueBack(
-          attributeMetadata.valueType,
-          currentTei.attributes[attribute]
-        ),
-        valueType: attributeMetadata.valueType,
-        displayName: attributeMetadata.displayName,
-        lastUpdated: currentTei.lastUpdated,
-      };
-    }
-  );
-  currentEnrollment.enrolledAt = moment(currentEnrollment.enrolledAt).format(
-    "YYYY-MM-DD"
-  );
-  currentEnrollment.incidentDate = moment(
-    currentEnrollment.incidentDate
-  ).format("YYYY-MM-DD");
+  currentTei.attributes = Object.keys(currentTei.attributes).map((attribute) => {
+    const attributeMetadata = programMetadata.trackedEntityAttributes.find((attr) => attr.id === attribute);
+    return {
+      attribute,
+      value: convertValueBack(attributeMetadata.valueType, currentTei.attributes[attribute]),
+      valueType: attributeMetadata.valueType,
+      displayName: attributeMetadata.displayName,
+      lastUpdated: currentTei.lastUpdated,
+    };
+  });
+  currentEnrollment.enrolledAt = moment(currentEnrollment.enrolledAt).format("YYYY-MM-DD");
+  currentEnrollment.incidentDate = moment(currentEnrollment.incidentDate).format("YYYY-MM-DD");
 
   currentEvents = currentEvents.map((event) => {
-    const programStage = programMetadata.programStages.find(
-      (ps) => ps.id === event.programStage
-    );
+    const programStage = programMetadata.programStages.find((ps) => ps.id === event.programStage);
 
     event.dataValues = Object.keys(event.dataValues).map((dataElement) => {
-      const dataElementMetadata = programStage.dataElements.find(
-        (de) => de.id === dataElement
-      );
+      const dataElementMetadata = programStage.dataElements.find((de) => de.id === dataElement);
       return {
         dataElement,
-        value: convertValueBack(
-          dataElementMetadata.valueType,
-          event.dataValues[dataElement]
-        ),
+        value: convertValueBack(dataElementMetadata.valueType, event.dataValues[dataElement]),
       };
     });
     event.occurredAt = moment(event.occurredAt).format("YYYY-MM-DD");
@@ -204,10 +186,7 @@ export const TableFilter = ({ metadata, onFilter, external, placeholder }) => {
               id={external.name}
               style={{ width: 250 }}
               onChange={(value) => {
-                onFilter(
-                  value ? moment(value).format("YYYY-MM-DD") : value,
-                  external.name
-                );
+                onFilter(value ? moment(value).format("YYYY-MM-DD") : value, external.name);
               }}
             />
           </div>
@@ -260,10 +239,7 @@ export const TableFilter = ({ metadata, onFilter, external, placeholder }) => {
                 id={metadata.id}
                 style={{ width: 250 }}
                 onChange={(value) => {
-                  onFilter(
-                    value ? moment(value).format("YYYY-MM-DD") : value,
-                    metadata.id
-                  );
+                  onFilter(value ? moment(value).format("YYYY-MM-DD") : value, metadata.id);
                 }}
               />
             </div>
@@ -335,6 +311,4 @@ export const onKeyDown = (event, pattern) => {
   }
 };
 
-export const handleLocalstorage = () => {
-
-}
+export const handleLocalstorage = () => {};
