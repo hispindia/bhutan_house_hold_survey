@@ -1,0 +1,195 @@
+import { onKeyDown } from "@/utils";
+import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
+import weekday from "dayjs/plugin/weekday"; 
+import localeData from "dayjs/plugin/localeData";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+const { TextArea } = Input;
+const { Option } = Select;
+
+const InputField = ({
+  // value,
+  valueType,
+  valueSet,
+  // onChange,
+  // onClick,
+  // addonBefore,
+  // disabled,
+  // addonAfter,
+  // inputRef,
+  ...props
+}) => {
+  const { t } = useTranslation();
+
+  if (valueSet) {
+    return (
+      <Select
+        // value={value}
+        allowClear
+        showSearch
+        style={{ width: "100%" }}
+        // onChange={(selected) => {
+        //   onChange(selected);
+        // }}
+        {...props}
+      >
+        {valueSet.map((set) => (
+          <Option key={set.label} value={set.value}>
+            {set.label}
+          </Option>
+        ))}
+      </Select>
+    );
+  }
+
+  switch (valueType) {
+    case "INTEGER_POSITIVE":
+    case "INTEGER_NEGATIVE":
+    case "INTEGER_ZERO_OR_POSITIVE":
+    case "PERCENTAGE":
+    case "NUMBER":
+    case "INTEGER":
+    case "PHONE_NUMBER":
+      return (
+        <Input
+          onKeyDown={(e) => {
+            onKeyDown(e, /^[0-9]+$/);
+          }}
+          // addonBefore={addonBefore}
+          // addonAfter={addonAfter}
+          // value={value || ""}
+          // onClick={onClick}
+          // onChange={(event) => {
+          //   onChange(event.target.value, event);
+          // }}
+          // disabled={disabled}
+          // ref={inputRef}
+          {...props}
+        />
+      );
+
+    case "TEXT":
+    case "EMAIL":
+   case "COORDINATE": 
+      
+      return (
+        <Input
+          // addonBefore={addonBefore}
+          // addonAfter={addonAfter}
+          // value={value || ""}
+          // onClick={onClick}
+          // onChange={(event) => {
+          //   onChange(event.target.value, event);
+          // }}
+          // disabled={disabled}
+          // ref={inputRef}
+          {...props}
+        />
+      );
+    case "LONG_TEXT":
+      return (
+        <TextArea
+          // value={value || ""}
+          // onChange={(event) => {
+          //   onChange(event.target.value, event);
+          // }}
+          {...props}
+        />
+      );
+    case "DATE":
+      return (
+        <DatePicker
+          // value={value ? moment(value) : ""}
+          // onChange={(momentObject) => {
+          //   onChange(momentObject.format("YYYY-MM-DD"));
+          // }}
+          {...props}
+        />
+      );
+    case "YEAR":
+      console.log("year",props)
+      return (
+        <DatePicker
+          picker="year"
+          {...props}
+          value={props.value ? dayjs(props.value) : ""}
+          onChange={(date, dateString) => {
+            props.onChange(dateString);
+          }}
+        />
+      );
+    case "DATETIME":
+      return <div>DATETIME</div>;
+    case "TIME":
+      return <div>TIME</div>;
+    case "BOOLEAN":
+      return (
+        <Radio.Group
+          // value={value}
+          // onChange={(event) => {
+          //   onChange(event.target.value, event);
+          // }}
+          {...props}
+        >
+          <Radio value="true" style={{ fontSize: "13.5px" }}>
+            {t("yes")}
+          </Radio>
+          <Radio value="false" style={{ fontSize: "13.5px" }}>
+            {t("no")}
+          </Radio>
+        </Radio.Group>
+      );
+    case "TRUE_ONLY":
+      return (
+        <Checkbox
+          // checked={value}
+          // onChange={(event) => {
+          //   onChange(event.target.checked, event);
+          // }}
+          // disabled={disabled}
+          {...props}
+        />
+      );
+    case "AGE":
+      return (
+        <DatePicker
+          // value={value}
+          // onChange={(momentObject) => {
+          //   onChange(momentObject);
+          // }}
+          {...props}
+        />
+      );
+    case "VILLAGE": {
+      console.log("onChange", props.onChange);
+      return null;
+    }
+    //  case "COORDINATE": 
+    //  {
+
+    //   console.log("tttttttttttt",props );
+    //    const coordinates = props.value;
+    //   return (
+    //        <Input
+    //         // type="text"
+    //         // className="w-full border rounded-lg p-2 pr-10"
+    //       //   placeholder={t("selectCoordinates")}
+    //       //  value={coordinates ? `${coordinates[0]}, ${coordinates[1]}` : ""}
+    //         {...props}
+    //       // value={props.value ? dayjs(props.value) : ""}
+    //         // readOnly
+    //       /> 
+    //   );
+    // }
+   
+    default:
+      return <span>UNSUPPORTED VALUE TYPE</span>;
+  }
+};
+
+export default InputField;

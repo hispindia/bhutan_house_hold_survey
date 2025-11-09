@@ -1,0 +1,506 @@
+import { generateUid } from "@/utils";
+import { useEffect, useState } from "react";
+import { Button, Card, Modal } from "react-bootstrap";
+import BootstrapTable from "react-bootstrap-table-next";
+import { useDispatch, useSelector } from "react-redux";
+import { defaultProgramTrackedEntityAttributeDisable, FORM_ACTION_TYPES, HAS_INITIAN_NOVALUE, MEMBER_FORM_VALIDATIONS_SECTION, TYPE_OF_ACTION } from "../constants";
+
+// Icon
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+/* SELECTOR */
+import { updateCascade } from "@/redux/actions/data/tei/currentCascade";
+import { isImmutableYear } from "@/utils/event";
+import _ from "lodash";
+import { useTranslation } from "react-i18next";
+import withDeleteConfirmation from "../../hocs/withDeleteConfirmation";
+import { changeMember } from "../../redux/actions/data/tei";
+import CaptureForm from "../CaptureForm";
+import "../CustomStyles/css/bootstrap.min.css";
+import "./CascadeTable.styles.css";
+import { transformData, transformMetadataToColumns } from "./utils";
+import { CloseOutlined } from "@ant-design/icons";
+import { Switch, Tooltip } from "antd";
+import moment from "moment";
+import { convertAttributesToForm, modifiedFormAttributesDisabledEnabled } from "@/utils/formMetadeta";
+import { houseHoldMemberFormMetaData } from "@/redux/actions/metadata";
+import { LocalStorageMemberForm, LocalStorageSelecteRow } from "@/utils/localStorageManager";
+
+const formModel = new LocalStorageMemberForm();
+const rowModel = new LocalStorageSelecteRow();
+
+const DeleteConfirmationButton = withDeleteConfirmation(Button);
+
+
+const CascadeTable = (props) => {
+  const {
+    classes,
+    className,
+    currentEvent,
+    changeEventDataValue,
+    editRowCallback = null,
+    callbackFunction = null,
+    initFunction = null,
+    externalComponents,
+    components = <div>Working...</div>,
+    locale,
+    originMetadata,
+    metadata,
+    setMetadata,
+    setData,
+    data,
+    ...other
+  } = props;
+  const { t } = useTranslation();
+  const [dataValuesTranslate, setDataValuesTranslate] = useState(null);
+  const { year } = useSelector((state) => state.data.tei.selectedYear);
+  const { immutableYear } = useSelector((state) => state.metadata);
+  const { currentCascade } = useSelector((state) => state.data.tei.data);
+
+  const dispatch = useDispatch();
+  const [columns, setColumns] = useState(transformMetadataToColumns(metadata, locale));
+  const profile = useSelector((state) => state.data.tei.data.currentTei);
+  const { programMetadataMember } = useSelector((state) => state.metadata);
+  const formAttrMetaData = useSelector(state => state.metadata?.formMetaData || []);
+
+  const [showData, setShowData] = useState(transformData(metadata, props.data, dataValuesTranslate, locale));
+
+  // console.log(' columns :>> ', columns, showData);
+
+  const [selectedData, setSelectedData] = useState({});
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+
+  const [formStatus, setFormStatus] = useState(FORM_ACTION_TYPES.NONE);
+  const [editable, setEditable] = useState(false)
+
+  const rowEvents = {
+    onClick: (e, row, rowIndex) => {
+      if (isImmutableYear(year, immutableYear)) return;
+      if (e.currentTarget && e.currentTarget.contains(e.target))
+        handleSelectRow(e, data[rowIndex], rowIndex);
+    },
+  };
+
+  const clearForm = () => {
+    setSelectedData({});
+    rowModel.set({});
+    setMetadata(originMetadata);
+    setSelectedRowIndex(null);
+    setFormStatus(FORM_ACTION_TYPES.NONE);
+    formModel.set(FORM_ACTION_TYPES.NONE)
+
+    setEditable(false)
+  };
+
+  const handleEditRow = (e, row, rowIndex) => {
+    // Update data
+    let rows = _.clone(data);
+    rows[rowIndex] = { ...row };
+
+    let dataRows = {
+      rows,
+    };
+    callbackFunction && callbackFunction(metadata, dataRows, rowIndex, "edit");
+
+    changeEventDataValue(
+      "oC9jreyd9SD",
+      JSON.stringify({ dataVals: dataRows["rows"] })
+    );
+    
+    setData([...dataRows["rows"]]);
+
+    let updatedMetadata = updateMetadata(metadata, dataRows["rows"]);
+    console.log("handleEditRow", { updatedMetadata, dataRows });
+
+    // update new currentCascade
+    const updatedCurrentCascade = {
+      ...currentCascade,
+      [year]: dataRows["rows"],
+    };
+    dispatch(updateCascade(updatedCurrentCascade));
+
+    setMetadata([...updatedMetadata]);
+    setFormStatus(FORM_ACTION_TYPES.NONE);
+  };
+
+  const handleBeforeAddNewRow = () => {
+    // Before add new data
+    setFormStatus(FORM_ACTION_TYPES.ADD_NEW);
+    formModel.set(FORM_ACTION_TYPES.ADD_NEW)
+
+
+    setSelectedData({ id: generateUid(), isNew: true, "hDE1WNqTTwF": profile.attributes["b4UUhQPwlRH"] });
+    rowModel.set({ id: generateUid(), isNew: true, "hDE1WNqTTwF": profile.attributes["b4UUhQPwlRH"] });
+    setSelectedRowIndex(null);
+  };
+
+  const handleAddNewRow = (e, row, continueAdd) => {
+    console.trace('row:>>>', row);
+    // Add new data
+    !continueAdd && setFormStatus(FORM_ACTION_TYPES.NONE);
+    data.push(row);
+
+    let dataRows = {
+      rows: data,
+    };
+
+    callbackFunction &&
+      callbackFunction(metadata, dataRows, dataRows["rows"].length - 1, "add");
+
+    changeEventDataValue(
+      "oC9jreyd9SD",
+      JSON.stringify({ dataVals: dataRows["rows"] })
+    );
+
+    setData([...dataRows["rows"]]);
+    let updatedMetadata = updateMetadata(metadata, dataRows["rows"]);
+
+    // update new currentCascade
+    const updatedCurrentCascade = {
+      ...currentCascade,
+      [year]: dataRows["rows"],
+    };
+    dispatch(updateCascade(updatedCurrentCascade));
+
+    console.log("handleAddNewRow", { updatedMetadata, dataRows });
+
+    setMetadata([...updatedMetadata]);
+  };
+
+  const handleSelectRow = (e, row, rowIndex) => {
+    console.log("selected", row);
+    setFormStatus(FORM_ACTION_TYPES.EDIT);
+    formModel.set(FORM_ACTION_TYPES.EDIT)
+    rowModel.set(row);
+    setSelectedData(row);
+    setSelectedRowIndex(rowIndex);
+    setEditable(true);
+  };
+
+  const handleDeleteRow = (e, row) => {
+    e.stopPropagation();
+    let dataRows = {
+      rows: data.filter((d) => d.id != row.id),
+    };
+
+    callbackFunction &&
+      callbackFunction(metadata, dataRows, null, "delete_member");
+    changeEventDataValue(
+      "oC9jreyd9SD",
+      JSON.stringify({ dataVals: dataRows["rows"] })
+    );
+    setData([...dataRows["rows"]]);
+    let updatedMetadata = updateMetadata(metadata, dataRows["rows"]);
+
+    // update new currentCascade
+    const updatedCurrentCascade = {
+      ...currentCascade,
+      [year]: dataRows["rows"],
+    };
+    dispatch(updateCascade(updatedCurrentCascade));
+
+    setMetadata([...updatedMetadata]);
+  };
+
+  const updateMetadata = (metadata, data) => {
+    metadata.forEach((md) => {
+      // Options
+      if (md.valueSet) {
+        md.valueSet.forEach((item) => {
+          // Compulsory
+          if (md.existCompulsory) {
+            if (data.length == 0) {
+              if (item.compulsory && !_.some(data, { [md.code]: item.value })) {
+                item.isDisabled = false;
+              } else {
+                item.isDisabled = true;
+              }
+            } else {
+              item.isDisabled = false;
+            }
+          }
+
+          // Unique
+          if (item.unique) {
+            if (_.some(data, { [md.code]: item.value })) {
+              item.isDisabled = true;
+            }
+          }
+
+          // Number column
+          // if (item.orderNumber) {
+          //   if (_.some(data.dataVals, { [md.code]: item.code })) {
+          //     item.disabled = true;
+          //   } else {
+          //     item.disabled = false;
+          //   }
+          // }
+        });
+      }
+    });
+    return metadata;
+  };
+
+  useEffect(() => {
+    let transformedData = transformData(
+      metadata,
+      props.data,
+      dataValuesTranslate,
+      locale
+    );
+    setShowData(transformedData);
+    setData(props.data);
+    let updatedMetadata = updateMetadata(metadata, props.data); // should not transformedData
+
+    setMetadata([...updatedMetadata]);
+
+    // REMOVE THIS - to fix bug losing calculated data
+    // if (currentEvent._isDirty) {
+    //   let dataRows = {
+    //     rows: transformedData,
+    //   };
+
+    //   callbackFunction && callbackFunction(metadata, dataRows);
+    // }
+  }, [JSON.stringify(props.data)]);
+
+  useEffect(() => {
+    let transformedData = transformData(
+      metadata,
+      data,
+      dataValuesTranslate,
+      locale
+    );
+    setShowData(transformedData);
+  }, [JSON.stringify(data)]);
+
+  useEffect(() => {
+
+    let tempDataValuesTranslate = metadata
+      .filter((e) => e.valueSet && e.valueSet.length > 0)
+      .reduce((obj, e) => {
+        obj[e.code] = e.valueSet.reduce((ob, op) => {
+          ob[op.value] = op.label;
+          if (op.translations) {
+            ob[op.value] = { ...op.translations, en: op.label };
+          }
+          return ob;
+        }, {});
+        return obj;
+      }, {});
+
+    setColumns(
+      transformMetadataToColumns(metadata, locale, tempDataValuesTranslate)
+    );
+    setDataValuesTranslate(tempDataValuesTranslate);
+
+
+    // handle reloading 
+    const row = rowModel.get()
+    setFormStatus(formModel.get());
+    setSelectedData(row);
+    setEditable(row['isNew'] ? false : true)
+
+    return () => {
+      console.log("Cascade table unmounted");
+      clearForm();
+    };
+  }, []);
+
+  useEffect(() => {
+    let rows = _.clone(data);
+    let dataRows = {
+      rows,
+    };
+
+    let cloneMetadata = _.clone(metadata).reduce((obj, md) => {
+      obj[md.code] = md;
+      return obj;
+    }, {});
+
+    initFunction && initFunction(cloneMetadata, dataRows);
+    setMetadata([...Object.values(cloneMetadata)]);
+  }, [JSON.stringify(metadata)]);
+
+  useEffect(() => {
+    let modifiedForms = convertAttributesToForm(programMetadataMember);
+    if (formStatus === FORM_ACTION_TYPES.EDIT) {
+      modifiedForms = modifiedFormAttributesDisabledEnabled(modifiedForms, true)
+    } else if (formStatus == FORM_ACTION_TYPES.ADD_NEW) {
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.TOBBACO_USE].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.ARECA_NUT].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.ACLOHAL_CONSUMPTION].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.DIET].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_WORK].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_TRAVEL].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_ACTIVITY_RECREATIONAL].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_RISED_BP].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.H_OF_DB].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_CHOLESTEROL].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HISTORY_OF_C_DISEASE].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.HEIGHT_WEIGHT].hidden = true;
+      modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.WAISE_HIP_CIRCUMFERENCE].hidden = true;
+    }
+
+    // handle fileds for previous value
+    Object.entries(selectedData).forEach(([key, value]) => {
+      editRowCallback(modifiedForms, {}, selectedData, key, value);
+    });
+
+    // dispatch(houseHoldMemberFormMetaData(modifiedForms));
+
+    return () => {
+      dispatch(houseHoldMemberFormMetaData({}));
+    }
+  }, [selectedData])
+
+
+  const columnsC = [
+    {
+      dataField: "no.",
+      text: "No.",
+      align: "center",
+      formatter: (cellContent, row, rowIndex, extraData) => {
+        return rowIndex + 1;
+      },
+    },
+    ...columns,
+    // TODO
+    {
+      dataField: "actions",
+      text: "Actions",
+      align: "center",
+      formatter: (cellContent, row, rowIndex, extraData) => {
+        return (
+          <DeleteConfirmationButton
+            variant="outline-danger"
+            size="sm"
+            disabled={
+              extraData !== FORM_ACTION_TYPES.NONE ||
+              isImmutableYear(year, immutableYear)
+            }
+            title={t("delete")}
+            onDelete={(e) => {
+              handleDeleteRow(e, row);
+            }}
+            messageText={t("deleteDialogContent")}
+            cancelText={t("cancel")}
+            deleteText={t("delete")}
+            onClick={(e) => {
+              e.stopPropagation();
+              dispatch(changeMember({ ...row, isDelete: true }));
+            }}
+            onCancel={(e) => {
+              callbackFunction(metadata, row, rowIndex, "clean");
+            }}
+          >
+            <FontAwesomeIcon icon={faTrash} size="xs" />
+          </DeleteConfirmationButton>
+        );
+      },
+      formatExtraData: formStatus,
+    },
+  ];
+
+  const handleAllowEditable = (eValue) => {
+    setEditable(eValue)
+
+    if (!data['isNew']) {
+      const modifiedEle = modifiedFormAttributesDisabledEnabled(formAttrMetaData, eValue)
+      console.log('modifiedEle', modifiedEle)
+      dispatch(houseHoldMemberFormMetaData(modifiedEle));
+    }
+  }
+  return (
+    <div className="bootstrap-iso">
+      <div className="container-fluid">
+        <div className="row">
+          <Modal
+            backdrop="static"
+            size="xl"
+            keyboard={false}
+            show={
+              formStatus === FORM_ACTION_TYPES.ADD_NEW ||
+              formStatus === FORM_ACTION_TYPES.EDIT
+            }
+          >
+            <Modal.Body>
+              <Card>
+                <Card.Body>
+                  <Card.Title className="d-flex justify-content-between">
+                    {t("familyMemberDetails")}
+                    <div className="gap-5 text-right">
+                      {formStatus == FORM_ACTION_TYPES.EDIT ?
+                        <Switch checked={!editable} onChange={() => handleAllowEditable(!editable)} checkedChildren="Editable" unCheckedChildren="Enable For edit" />
+                        : ''}
+                      <Button type="text" className="btn btn-light" onClick={clearForm}>
+                        <CloseOutlined />
+                      </Button>
+                    </div>
+
+                  </Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    {formStatus !== FORM_ACTION_TYPES.ADD_NEW &&
+                      "No." + (selectedRowIndex + 1)}
+                  </Card.Subtitle>
+                  <CaptureForm
+                    locale={locale}
+                    // metadata={metadata}
+                    rowIndex={selectedRowIndex}
+                    data={_.cloneDeep(selectedData)}
+                    formStatus={formStatus}
+                    setFormStatus={setFormStatus}
+                    handleEditRow={handleEditRow}
+                    handleAddNewRow={handleAddNewRow}
+                    editRowCallback={editRowCallback}
+                    allowFormEditable={editable}
+                    maxDate={moment(new Date()).format('YYYY-MM-DD')}
+                    minDate={new Date(`1900-12-31`)}
+                  />
+                </Card.Body>
+              </Card>
+            </Modal.Body>
+          </Modal>
+        </div>
+
+        {/* <hr className="mb-4" /> */}
+        <div className="row">
+          <div className="mb-4 mr-auto mr-sm-0">
+            <Button
+              type="button"
+              size="sm"
+              style={{ width: 160 }}
+              className="btn btn-success"
+              onClick={() => handleBeforeAddNewRow()}
+              aria-controls="collapseExample"
+              aria-expanded={formStatus === FORM_ACTION_TYPES.ADD_NEW}
+            >
+              {t("addNewMember")}
+            </Button>
+          </div>
+          {/* <div className="col-md-4 order-md-4 mb-4">
+            <div>{externalComponents && externalComponents["nextButton"]}</div>
+          </div> */}
+        </div>
+        <div className="row">
+          <div className="col-md-12 order-md-12 mb-12 table-sm overflow-auto table-responsive pl-0">
+            <BootstrapTable
+              keyField="id"
+              data={showData}
+              columns={columnsC}
+              rowEvents={rowEvents}
+              striped
+              hover
+              condensed
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+CascadeTable.propTypes = {};
+
+export default CascadeTable;

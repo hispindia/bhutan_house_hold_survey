@@ -1,0 +1,277 @@
+import { Button, Col, Form, Row, Table, Tabs } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import SideBarContainer from "@/containers/SideBar";
+import withDhis2FormItem from "@/hocs/withDhis2Field";
+import CFormControl from "../CustomAntForm/CFormControl";
+import InputField from "../InputField";
+import useHouseholdSurveyForm from "@/hooks/useHouseholdSurveyForm";
+
+/* style */
+import "./index.css";
+import { debounce } from "lodash";
+import { getEventByYearAndHalt6Month } from "@/utils/event";
+
+const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
+  const dataElements = useSelector(
+    (state) => state.metadata.programMetadata.programStages[0].dataElements
+  );
+  const events = useSelector((state) => state.data.tei.data.currentEvents);
+
+  const selectedYear = useSelector((state) => state.data.tei.selectedYear);
+
+  const eventData = getEventByYearAndHalt6Month(
+    events,
+    selectedYear.year,
+    selectedYear.selected6Month
+  );
+
+  const Dhis2FormItem = useMemo(
+    () => withDhis2FormItem(dataElements)(CFormControl),
+    [dataElements]
+  );
+
+  const { form, surveyList, loadServeyFields } = useHouseholdSurveyForm(values);
+
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState({});
+
+  const columns = [
+    {
+      dataIndex: "label",
+      key: "label",
+      render: (value, row, index) => {
+        const { type, styles } = row;
+        return {
+          children: value,
+          props: {
+            colSpan: type === "title" ? 4 : 1,
+            style: styles,
+          },
+        };
+      },
+    },
+    {
+      dataIndex: "input1",
+      key: "input1",
+      render: (value, row, index) => {
+        return {
+          children: value,
+          props: {
+            colSpan: getInputRowSpan(row, true),
+          },
+        };
+      },
+    },
+    {
+      dataIndex: "input2",
+      key: "input2",
+      render: (value, row, index) => {
+        return {
+          children: value,
+          props: {
+            colSpan: getInputRowSpan(row),
+          },
+        };
+      },
+    },
+    {
+      dataIndex: "input3",
+      key: "input3",
+      render: (value, row, index) => {
+        return {
+          children: value,
+          props: {
+            colSpan: getInputRowSpan(row),
+          },
+        };
+      },
+    },
+  ];
+
+  const getInputRowSpan = (row, isFirstInput = false) => {
+    const { type, uid } = row;
+    return type === "title" ? 0 : uid ? (isFirstInput ? 3 : 0) : 1;
+  };
+
+  const handleFormData = (id, value) => {
+    console.log("handleFormData:>>>", id, value);
+    setFormData({ ...formData, [id]: value });
+  };
+
+  useEffect(() => {
+    loadServeyFields();
+  }, []);
+
+  const dataSource = surveyList.map((row, index) => {
+    const {
+      uid,
+      some,
+      alot,
+      thirdRowTitle,
+      thirdRowId,
+      name,
+      type,
+      hidden,
+      permanentHide,
+      dependentFields = [],
+      setValuesFunc = () => {},
+      showFieldFunc = () => true,
+      childPropsFunc = () => {},
+    } = row;
+    switch (type) {
+      case "title": {
+        return {
+          ...row,
+          key: index,
+          label: name,
+        };
+      }
+      default: {
+        if (uid) {
+          return {
+            ...row,
+            key: index,
+            label: name,
+            input1: (
+              <Dhis2FormItem
+                noStyle
+                id={uid}
+                value={formData[uid] || ""}
+                hidden={permanentHide == true ? true : hidden}
+                dependentFields={dependentFields}
+                setValuesFunc={setValuesFunc}
+                showFieldFunc={showFieldFunc}
+                childPropsFunc={childPropsFunc}
+              >
+                <InputField size="small" style={{ minWidth: "100%" }} />
+              </Dhis2FormItem>
+            ),
+          };
+        } else {
+          return {
+            ...row,
+            key: index,
+            label: name,
+            input1: (
+              <Dhis2FormItem
+                hidden={hidden}
+                displayFormName={t("some")}
+                id={some}
+              >
+                <InputField
+                  value={formData[uid] || ""}
+                  hidden={permanentHide == true ? true : hidden}
+                  size="small"
+                />
+              </Dhis2FormItem>
+            ),
+            input2: (
+              <Dhis2FormItem
+                hidden={hidden}
+                displayFormName={t("alot")}
+                id={alot}
+              >
+                <InputField
+                  value={formData[uid] || ""}
+                  hidden={permanentHide == true ? true : hidden}
+                  size="small"
+                />
+              </Dhis2FormItem>
+            ),
+            input3: (
+              <Dhis2FormItem
+                hidden={hidden}
+                displayFormName={t(thirdRowTitle)}
+                id={thirdRowId}
+              >
+                <InputField
+                  value={formData[uid] || ""}
+                  hidden={permanentHide == true ? true : hidden}
+                  size="small"
+                />
+              </Dhis2FormItem>
+            ),
+          };
+        }
+      }
+    }
+  });
+
+  const items = [
+    {
+      key: 1,
+      label: ``,
+      children: (
+        <Table
+          size="small"
+          bordered
+          pagination={false}
+          showHeader={false}
+          dataSource={dataSource}
+          columns={columns}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <Form
+      onFieldsChange={debounce(loadServeyFields, 1000)}
+      initialValues={values}
+      form={form}
+      onFinish={(fieldsValue) => {
+        onSubmit(fieldsValue);
+      }}
+    >
+      <div className="d-md-flex">
+        <Col className="leftBar mr-2 mt-2">
+          <SideBarContainer />
+
+          <Row justify="center">
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="mt-2"
+              style={{
+                width: "100%",
+                backgroundColor: "#4CAF50",
+              }}
+            >
+              {t("save")}
+            </Button>
+          </Row>
+        </Col>
+
+        {events && events.length > 0 ? (
+          <Col className="rightBar">
+            <Tabs
+              defaultActiveKey="1"
+              size="small"
+              items={items}
+              onChange={onTabChange}
+            />
+            <Button
+              type="primary"
+              className="mt-2"
+              onClick={() => onSubmit(values)}
+              style={{
+                width: "10%",
+                backgroundColor: "#4CAF50",
+              }}
+            >
+              {t("save")}
+            </Button>
+          </Col>
+        ) : (
+          <div className="text-center mt-5">
+            <h5>Please add new Year for entering data</h5>
+          </div>
+        )}
+      </div>
+    </Form>
+  );
+};
+
+export default CensusDetailForm;
