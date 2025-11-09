@@ -32,7 +32,7 @@ export const pull = async ({
               {
                 paging: true,
                 totalPages: true,
-                pageSize: 200,
+                pageSize: 1000,
                 page,
               },
               [
@@ -93,14 +93,17 @@ export const pull = async ({
   }
 };
 
-export const push = async () => {
+export const push = async (progressCallback) => {
   console.time("Enrollment::push");
   var start = performance.now();
 
   const enrollments = await findOffline();
 
   if (enrollments?.length > 0) {
-    const results = await pushAndMarkOnline(toDhis2Enrollments(enrollments));
+    const results = await pushAndMarkOnline(
+      toDhis2Enrollments(enrollments),
+      progressCallback
+    );
 
     for (const result of results) {
       console.log(result.status);
@@ -131,7 +134,7 @@ const markOnline = async (enrollmentIds) => {
     .modify({ isOnline: 1 });
 };
 
-const pushAndMarkOnline = async (enrollments) => {
+const pushAndMarkOnline = async (enrollments, progressCallback) => {
   const results = [];
 
   if (enrollments.length === 0) {
@@ -139,8 +142,11 @@ const pushAndMarkOnline = async (enrollments) => {
   }
 
   const partitions = chunk(enrollments, 20);
+  const totalOriginalEnrollments = enrollments.length;
+  let processedEnrollmentsCount = 0;
 
-  for (const partition of partitions) {
+  for (let i = 0; i < partitions.length; i++) {
+    const partition = partitions[i];
     console.log("pushEnrollment", { partition });
 
     try {
@@ -154,6 +160,21 @@ const pushAndMarkOnline = async (enrollments) => {
 
       if (result.status === "OK") {
         await markOnline(partition.map((en) => en.enrollment));
+        processedEnrollmentsCount += partition.length;
+
+        // Call progress callback if provided
+        if (progressCallback) {
+          const percent =
+            processedEnrollmentsCount === totalOriginalEnrollments
+              ? 100
+              : Math.min(
+                  Math.round(
+                    (processedEnrollmentsCount / totalOriginalEnrollments) * 100
+                  ),
+                  99
+                );
+          progressCallback({ id: "enr", percent });
+        }
       }
     } catch (error) {
       console.error(`Failed to push enrollment`, error);

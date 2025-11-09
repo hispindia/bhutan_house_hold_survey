@@ -1,17 +1,12 @@
-import React, { useState } from "react";
-import { Button } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilePdf, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import { useState } from "react";
+import { Button } from "react-bootstrap";
 // import "svg2pdf.js";
-import {
-  exportHighChart,
-  toImageData,
-  convertSVGToBase64,
-} from "../services/hightchart";
 import { useTranslation } from "react-i18next";
-import html2canvas from "html2canvas";
+import { convertSVGToBase64 } from "../services/hightchart";
 import "./fonts/Phetsarath-normal";
 
 const PADDING_BOT = 5;

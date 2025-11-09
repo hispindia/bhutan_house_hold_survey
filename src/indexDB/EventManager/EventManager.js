@@ -135,14 +135,17 @@ export const pull = async ({
   }
 };
 
-export const push = async () => {
+export const push = async (progressCallback) => {
   console.time("Event::push");
   var start = performance.now();
 
   const events = await findOffline();
 
   if (events?.length > 0) {
-    const results = await pushAndMarkOnline(toDhis2Events(events));
+    const results = await pushAndMarkOnline(
+      toDhis2Events(events),
+      progressCallback
+    );
 
     for (const result of results) {
       console.log(result.status);
@@ -169,7 +172,7 @@ const markOnline = async (eventIds) => {
     .modify({ isOnline: 1 });
 };
 
-const pushAndMarkOnline = async (events) => {
+const pushAndMarkOnline = async (events, progressCallback) => {
   const results = [];
 
   if (events.length === 0) {
@@ -177,8 +180,11 @@ const pushAndMarkOnline = async (events) => {
   }
 
   const partitions = chunk(events, 20);
+  const totalOriginalEvents = events.length;
+  let processedEventsCount = 0;
 
-  for (const partition of partitions) {
+  for (let i = 0; i < partitions.length; i++) {
+    const partition = partitions[i];
     console.log("pushEvents", { partition });
 
     try {
@@ -192,6 +198,21 @@ const pushAndMarkOnline = async (events) => {
 
       if (result.status === "OK") {
         await markOnline(partition.map((en) => en.event));
+        processedEventsCount += partition.length;
+
+        // Call progress callback if provided
+        if (progressCallback) {
+          const percent =
+            processedEventsCount === totalOriginalEvents
+              ? 100
+              : Math.min(
+                  Math.round(
+                    (processedEventsCount / totalOriginalEvents) * 100
+                  ),
+                  99
+                );
+          progressCallback({ id: "event", percent });
+        }
       }
     } catch (error) {
       console.error(`Failed to push event`, error);

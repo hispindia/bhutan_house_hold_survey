@@ -1,11 +1,10 @@
-import React from "react";
 import { createTheme, ThemeProvider } from "@material-ui/core/styles";
 import { SnackbarProvider } from "notistack";
-import AppContextProvider from "../App/App.context";
 import styles from "../../components/App/App.module.css";
+import AppContextProvider from "../App/App.context";
 
 import HeaderBar from "@/components/HeaderBar/HeaderBar.component";
-import { useDisableSwipeDownRefresh, useIsPwa } from "@/hooks";
+import { useIsPwa } from "@/hooks";
 const { app, headerBarContainer } = styles;
 
 const theme = createTheme({
