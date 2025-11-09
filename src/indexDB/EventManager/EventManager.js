@@ -46,9 +46,7 @@ export const getEventsRawData = async (pager, org, program) => {
 };
 
 export const getEventsAnalyticsTable = async (pager, org, program) => {
-  const dataElementIds = program.programStages[0].dataElements.map(
-    (de) => de.id
-  );
+  const dataElementIds = program.programStages[0].dataElements.map((de) => de.id);
 
   return await dataApi.get(
     `/api/analytics/events/query/${program.id}`,
@@ -66,10 +64,7 @@ export const getEventsAnalyticsTable = async (pager, org, program) => {
   );
 };
 
-export const pull = async ({
-  handleDispatchCurrentOfflineLoading,
-  offlineSelectedOrgUnits,
-}) => {
+export const pull = async ({ handleDispatchCurrentOfflineLoading, offlineSelectedOrgUnits }) => {
   try {
     // Delete the table
     await db[TABLE_NAME].clear();
@@ -100,17 +95,11 @@ export const pull = async ({
               program
             );
 
-            if (
-              !result.rows ||
-              result.rows.length === 0 ||
-              page > result.metaData.pager.pageCount
-            ) {
+            if (!result.rows || result.rows.length === 0 || page > result.metaData.pager.pageCount) {
               break;
             }
 
-            console.log(
-              `EVENT = (page=${page}/${result.metaData.pager.pageCount}, count=${result.rows.length})`
-            );
+            console.log(`EVENT = (page=${page}/${result.metaData.pager.pageCount}, count=${result.rows.length})`);
 
             await persist(await beforePersistAnalyticsData(result, program));
 
@@ -142,10 +131,7 @@ export const push = async (progressCallback) => {
   const events = await findOffline();
 
   if (events?.length > 0) {
-    const results = await pushAndMarkOnline(
-      toDhis2Events(events),
-      progressCallback
-    );
+    const results = await pushAndMarkOnline(toDhis2Events(events), progressCallback);
 
     for (const result of results) {
       console.log(result.status);
@@ -167,9 +153,7 @@ const findOffline = async () => {
 };
 
 const markOnline = async (eventIds) => {
-  return await db[TABLE_NAME].where("event")
-    .anyOf(eventIds)
-    .modify({ isOnline: 1 });
+  return await db[TABLE_NAME].where("event").anyOf(eventIds).modify({ isOnline: 1 });
 };
 
 const pushAndMarkOnline = async (events, progressCallback) => {
@@ -200,11 +184,7 @@ const pushAndMarkOnline = async (events, progressCallback) => {
     const failedEvents = [];
 
     console.log(
-      `Event push attempt ${
-        attempt + 1
-      } with chunk size ${chunkSize}, processing ${
-        eventsToProcess.length
-      } events`
+      `Event push attempt ${attempt + 1} with chunk size ${chunkSize}, processing ${eventsToProcess.length} events`
     );
 
     for (let i = 0; i < partitions.length; i++) {
@@ -227,19 +207,11 @@ const pushAndMarkOnline = async (events, progressCallback) => {
             const percent =
               processedEventsCount === totalOriginalEvents
                 ? 100
-                : Math.min(
-                    Math.round(
-                      (processedEventsCount / totalOriginalEvents) * 100
-                    ),
-                    99
-                  );
+                : Math.min(Math.round((processedEventsCount / totalOriginalEvents) * 100), 99);
             progressCallback({ id: "event", percent });
           }
         } else {
-          console.error(
-            `Failed to push event chunk - status: ${result.status}`,
-            result
-          );
+          console.error(`Failed to push event chunk - status: ${result.status}`, result);
           // Add failed events back to the list for retry
           failedEvents.push(...partition);
         }
@@ -255,14 +227,10 @@ const pushAndMarkOnline = async (events, progressCallback) => {
     eventsToProcess = failedEvents;
 
     if (eventsToProcess.length === 0) {
-      console.log(
-        `All events processed successfully after ${attempt + 1} attempts`
-      );
+      console.log(`All events processed successfully after ${attempt + 1} attempts`);
       break;
     } else if (attempt === chunkSizes.length - 1) {
-      console.error(
-        `Failed to process ${eventsToProcess.length} events after all retry attempts`
-      );
+      console.error(`Failed to process ${eventsToProcess.length} events after all retry attempts`);
     }
   }
 
@@ -340,14 +308,7 @@ const convertValue = (metadata, datavalue) => {
   }
 };
 
-export const getEventsByQuery = async ({
-  program,
-  programStage,
-  orgUnit,
-  filters,
-  startDate,
-  endDate,
-}) => {
+export const getEventsByQuery = async ({ program, programStage, orgUnit, filters, startDate, endDate }) => {
   let queryBuilder = db[TABLE_NAME].where("orgUnit").equals(orgUnit);
 
   if (filters && filters.length > 0) {
@@ -404,9 +365,7 @@ const beforePersistAnalyticsData = async (result, program) => {
     return objects;
   }
 
-  const dataElementIds = program.programStages[0].dataElements.map(
-    (de) => de.id
-  );
+  const dataElementIds = program.programStages[0].dataElements.map((de) => de.id);
 
   for (const ev of events) {
     const event = {
@@ -517,6 +476,11 @@ const setEvent = async (ev) => {
   } catch (error) {
     console.error(`Failed to add org`, error);
   }
+};
+
+export const clearTable = async () => {
+  console.log("Clearing Event table");
+  await db[TABLE_NAME].clear();
 };
 
 /**

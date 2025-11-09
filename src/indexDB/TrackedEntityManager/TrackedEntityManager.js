@@ -10,15 +10,9 @@ import * as programManager from "@/indexDB/ProgramManager/ProgramManager";
 import { chunk } from "lodash";
 import { toDhis2Enrollments } from "../data/enrollment";
 import { toDhis2Events } from "../data/event";
-import {
-  toDhis2TrackedEntities,
-  toDhis2TrackedEntity,
-} from "../data/trackedEntity";
+import { toDhis2TrackedEntities, toDhis2TrackedEntity } from "../data/trackedEntity";
 
-export const pull = async ({
-  handleDispatchCurrentOfflineLoading,
-  offlineSelectedOrgUnits,
-}) => {
+export const pull = async ({ handleDispatchCurrentOfflineLoading, offlineSelectedOrgUnits }) => {
   try {
     await db[TABLE_NAME].clear();
     const programs = await programManager.getPrograms();
@@ -54,17 +48,11 @@ export const pull = async ({
               ]
             );
 
-            if (
-              !result.instances ||
-              result.instances.length === 0 ||
-              page > result.pageCount
-            ) {
+            if (!result.instances || result.instances.length === 0 || page > result.pageCount) {
               break;
             }
 
-            console.log(
-              `TEI = (page=${page}/${result.pageCount}, count=${result.instances.length})`
-            );
+            console.log(`TEI = (page=${page}/${result.pageCount}, count=${result.instances.length})`);
 
             const resultTrackEntities = {
               ...result,
@@ -101,10 +89,7 @@ export const push = async (progressCallback) => {
   const trackedEntities = await findOffline();
 
   if (trackedEntities?.length > 0) {
-    const results = await pushAndMarkOnline(
-      toDhis2TrackedEntities(trackedEntities),
-      progressCallback
-    );
+    const results = await pushAndMarkOnline(toDhis2TrackedEntities(trackedEntities), progressCallback);
 
     for (const result of results) {
       console.log(result.status);
@@ -153,9 +138,7 @@ export const pushAndMarkOnline = async (trackedEntities, progressCallback) => {
     const failedEntities = [];
 
     console.log(
-      `TrackedEntity push attempt ${
-        attempt + 1
-      } with chunk size ${chunkSize}, processing ${
+      `TrackedEntity push attempt ${attempt + 1} with chunk size ${chunkSize}, processing ${
         entitiesToProcess.length
       } entities`
     );
@@ -180,19 +163,11 @@ export const pushAndMarkOnline = async (trackedEntities, progressCallback) => {
             const percent =
               processedEntitiesCount === totalOriginalEntities
                 ? 100
-                : Math.min(
-                    Math.round(
-                      (processedEntitiesCount / totalOriginalEntities) * 100
-                    ),
-                    99
-                  );
+                : Math.min(Math.round((processedEntitiesCount / totalOriginalEntities) * 100), 99);
             progressCallback({ id: "tei", percent });
           }
         } else {
-          console.error(
-            `Failed to push trackedEntity chunk - status: ${result.status}`,
-            result
-          );
+          console.error(`Failed to push trackedEntity chunk - status: ${result.status}`, result);
           // Add failed entities back to the list for retry
           failedEntities.push(...partition);
         }
@@ -208,16 +183,10 @@ export const pushAndMarkOnline = async (trackedEntities, progressCallback) => {
     entitiesToProcess = failedEntities;
 
     if (entitiesToProcess.length === 0) {
-      console.log(
-        `All tracked entities processed successfully after ${
-          attempt + 1
-        } attempts`
-      );
+      console.log(`All tracked entities processed successfully after ${attempt + 1} attempts`);
       break;
     } else if (attempt === chunkSizes.length - 1) {
-      console.error(
-        `Failed to process ${entitiesToProcess.length} tracked entities after all retry attempts`
-      );
+      console.error(`Failed to process ${entitiesToProcess.length} tracked entities after all retry attempts`);
     }
   }
 
@@ -225,9 +194,7 @@ export const pushAndMarkOnline = async (trackedEntities, progressCallback) => {
 };
 
 const markOnline = async (trackedEntityIds) => {
-  return await db[TABLE_NAME].where("trackedEntity")
-    .anyOf(trackedEntityIds)
-    .modify({ isOnline: 1 });
+  return await db[TABLE_NAME].where("trackedEntity").anyOf(trackedEntityIds).modify({ isOnline: 1 });
 };
 
 export const setTrackedEntityInstance = async ({ trackedEntity }) => {
@@ -240,9 +207,7 @@ export const setTrackedEntityInstance = async ({ trackedEntity }) => {
 
     if (trackedEntity.enrollments.length > 0) {
       // UPDATE ENROLLMENT
-      const enrollment = JSON.parse(
-        JSON.stringify(trackedEntity.enrollments[0])
-      );
+      const enrollment = JSON.parse(JSON.stringify(trackedEntity.enrollments[0]));
 
       await enrollmentManager.setEnrollment({
         enrollment,
@@ -340,17 +305,11 @@ const filterQueryBuilder = (query, filters) => {
         const [attribute, field, operator, value] = filter.split(/[:=]/);
 
         if (operator === "EQ") {
-          passes =
-            passes &&
-            teiValue[attribute] === field &&
-            teiValue["value"] === value;
+          passes = passes && teiValue[attribute] === field && teiValue["value"] === value;
         }
 
         if (operator === "LIKE") {
-          passes =
-            passes &&
-            teiValue[attribute] === field &&
-            teiValue["value"].includes(value);
+          passes = passes && teiValue[attribute] === field && teiValue["value"].includes(value);
         }
       });
 
@@ -365,9 +324,7 @@ const filterQueryBuilder = (query, filters) => {
 
 export const findOne = async (trackedEntity) => {
   try {
-    const tei = await db[TABLE_NAME].where("trackedEntity")
-      .equals(trackedEntity)
-      .toArray();
+    const tei = await db[TABLE_NAME].where("trackedEntity").equals(trackedEntity).toArray();
 
     return toDhis2TrackedEntity(tei);
   } catch (error) {
@@ -376,9 +333,7 @@ export const findOne = async (trackedEntity) => {
 };
 export const findOuPattern = async ({ orgUnit }) => {
   try {
-    const patternData = await db[TABLE_NAME].where("trackedEntity")
-      .equals(orgUnit)
-      .toArray();
+    const patternData = await db[TABLE_NAME].where("trackedEntity").equals(orgUnit).toArray();
 
     // return toDhis2TrackedEntity(tei);
     console.log("patternData :>> ", patternData);
@@ -387,15 +342,7 @@ export const findOuPattern = async ({ orgUnit }) => {
   }
 };
 
-export const find = async ({
-  paging = true,
-  pageSize,
-  page,
-  orgUnit,
-  filters,
-  program,
-  ouMode = "SELECTED",
-}) => {
+export const find = async ({ paging = true, pageSize, page, orgUnit, filters, program, ouMode = "SELECTED" }) => {
   try {
     const result = {
       instances: [],
@@ -404,24 +351,19 @@ export const find = async ({
     // get child orgUnits
     const selectedOrgUnit = await orgUnitManager.getOrgWithChildren(orgUnit);
 
-    const selectedOrgUnitIds =
-      selectedOrgUnit?.children.map((ou) => ou.id) || [];
+    const selectedOrgUnitIds = selectedOrgUnit?.children.map((ou) => ou.id) || [];
 
     let query = {
       program,
     };
 
     // filter out undefined values
-    Object.keys(query).forEach(
-      (key) => query[key] === undefined && delete query[key]
-    );
+    Object.keys(query).forEach((key) => query[key] === undefined && delete query[key]);
 
     let queryBuilder = db.enrollment.where(query);
 
     if (ouMode === "DESCENDANTS" && selectedOrgUnitIds.length > 0) {
-      queryBuilder = queryBuilder.and((enr) =>
-        selectedOrgUnitIds.includes(enr.orgUnit)
-      );
+      queryBuilder = queryBuilder.and((enr) => selectedOrgUnitIds.includes(enr.orgUnit));
     } else {
       queryBuilder = queryBuilder.and((enr) => enr.orgUnit === orgUnit);
     }
@@ -429,21 +371,14 @@ export const find = async ({
     if (filters && filters.length > 0 && Boolean(filters[0])) {
       let teisFilterQueryBuilder = await db[TABLE_NAME];
 
-      teisFilterQueryBuilder = filterQueryBuilder(
-        teisFilterQueryBuilder,
-        filters
-      );
+      teisFilterQueryBuilder = filterQueryBuilder(teisFilterQueryBuilder, filters);
 
       const teisMatchFilter = await teisFilterQueryBuilder.toArray();
-      const teisMatchFilterIds = teisMatchFilter.map(
-        (tei) => tei.trackedEntity
-      );
+      const teisMatchFilterIds = teisMatchFilter.map((tei) => tei.trackedEntity);
 
       console.log({ teisMatchFilterIds });
 
-      queryBuilder = queryBuilder.and((enr) =>
-        teisMatchFilterIds.includes(enr.trackedEntity)
-      );
+      queryBuilder = queryBuilder.and((enr) => teisMatchFilterIds.includes(enr.trackedEntity));
     }
 
     let pager = {};
@@ -468,9 +403,7 @@ export const find = async ({
 
     const trackedEntities = enrs.map((enr) => enr.trackedEntity);
 
-    let teisQueryBuilder = await db[TABLE_NAME].where("trackedEntity").anyOf(
-      trackedEntities
-    );
+    let teisQueryBuilder = await db[TABLE_NAME].where("trackedEntity").anyOf(trackedEntities);
 
     const teis = await teisQueryBuilder.toArray();
 
@@ -488,10 +421,7 @@ export const find = async ({
   }
 };
 
-export const getTrackedEntityInstanceById = async ({
-  trackedEntity,
-  program,
-}) => {
+export const getTrackedEntityInstanceById = async ({ trackedEntity, program }) => {
   const events = await db.event
     .where("trackedEntity")
     .equals(trackedEntity)
@@ -504,9 +434,7 @@ export const getTrackedEntityInstanceById = async ({
     .and((enr) => enr.program === program)
     .first();
 
-  const tei = toDhis2TrackedEntity(
-    await db[TABLE_NAME].where("trackedEntity").equals(trackedEntity).toArray()
-  );
+  const tei = toDhis2TrackedEntity(await db[TABLE_NAME].where("trackedEntity").equals(trackedEntity).toArray());
 
   if (enr) {
     tei.enrollments = toDhis2Enrollments([enr], toDhis2Events(events));
@@ -543,10 +471,7 @@ export const getTrackedEntityInstances = async ({ orgUnit, filters }) => {
   };
 };
 
-export const getTrackedEntityInstancesByIDs = async ({
-  program,
-  trackedEntities,
-}) => {
+export const getTrackedEntityInstancesByIDs = async ({ program, trackedEntities }) => {
   const enrs = await db.enrollment
     .where("trackedEntity")
     .anyOf(trackedEntities)
@@ -563,9 +488,7 @@ export const getTrackedEntityInstancesByIDs = async ({
     enr.events = toDhis2Events(events);
   }
 
-  const teis = toDhis2TrackedEntities(
-    await db[TABLE_NAME].where("trackedEntity").anyOf(trackedEntities).toArray()
-  );
+  const teis = toDhis2TrackedEntities(await db[TABLE_NAME].where("trackedEntity").anyOf(trackedEntities).toArray());
 
   for (const tei of teis) {
     const teiEnr = enrs.find((enr) => enr.trackedEntity === tei.trackedEntity);
@@ -599,9 +522,7 @@ export const deleteTrackedEntityInstances = async ({ trackedEntities }) => {
 
       if (trackedEntity.enrollments.length > 0) {
         // DELETE ENROLLMENT
-        const enrollment = JSON.parse(
-          JSON.stringify(trackedEntity.enrollments[0])
-        );
+        const enrollment = JSON.parse(JSON.stringify(trackedEntity.enrollments[0]));
         await db.enrollment.where("trackedEntity").anyOf(teiId).delete();
 
         // UPDATE EVENTS
@@ -613,6 +534,11 @@ export const deleteTrackedEntityInstances = async ({ trackedEntities }) => {
   } catch (error) {
     console.error(`Failed to add trackedEntity`, error);
   }
+};
+
+export const clearTable = async () => {
+  console.log("clearing TrackedEntity table...");
+  return await db[TABLE_NAME].clear();
 };
 
 // trackedEntity	INTEGER	NO	NULL

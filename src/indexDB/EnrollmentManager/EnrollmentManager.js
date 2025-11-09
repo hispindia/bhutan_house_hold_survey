@@ -6,10 +6,7 @@ import { TABLE_NAME } from ".";
 import { toDhis2Enrollments } from "../data/enrollment";
 import db from "../db";
 
-export const pull = async ({
-  handleDispatchCurrentOfflineLoading,
-  offlineSelectedOrgUnits,
-}) => {
+export const pull = async ({ handleDispatchCurrentOfflineLoading, offlineSelectedOrgUnits }) => {
   try {
     await db[TABLE_NAME].clear();
     // const updatedAt = moment().subtract(3, 'months').format('YYYY-MM-DD');
@@ -56,11 +53,7 @@ export const pull = async ({
               ]
             );
 
-            if (
-              !result.instances ||
-              result.instances.length === 0 ||
-              page > result.pageCount
-            ) {
+            if (!result.instances || result.instances.length === 0 || page > result.pageCount) {
               break;
             }
 
@@ -100,10 +93,7 @@ export const push = async (progressCallback) => {
   const enrollments = await findOffline();
 
   if (enrollments?.length > 0) {
-    const results = await pushAndMarkOnline(
-      toDhis2Enrollments(enrollments),
-      progressCallback
-    );
+    const results = await pushAndMarkOnline(toDhis2Enrollments(enrollments), progressCallback);
 
     for (const result of results) {
       console.log(result.status);
@@ -129,9 +119,7 @@ const findOffline = async () => {
 };
 
 const markOnline = async (enrollmentIds) => {
-  return await db[TABLE_NAME].where("enrollment")
-    .anyOf(enrollmentIds)
-    .modify({ isOnline: 1 });
+  return await db[TABLE_NAME].where("enrollment").anyOf(enrollmentIds).modify({ isOnline: 1 });
 };
 
 const pushAndMarkOnline = async (enrollments, progressCallback) => {
@@ -162,9 +150,7 @@ const pushAndMarkOnline = async (enrollments, progressCallback) => {
     const failedEnrollments = [];
 
     console.log(
-      `Enrollment push attempt ${
-        attempt + 1
-      } with chunk size ${chunkSize}, processing ${
+      `Enrollment push attempt ${attempt + 1} with chunk size ${chunkSize}, processing ${
         enrollmentsToProcess.length
       } enrollments`
     );
@@ -190,20 +176,11 @@ const pushAndMarkOnline = async (enrollments, progressCallback) => {
             const percent =
               processedEnrollmentsCount === totalOriginalEnrollments
                 ? 100
-                : Math.min(
-                    Math.round(
-                      (processedEnrollmentsCount / totalOriginalEnrollments) *
-                        100
-                    ),
-                    99
-                  );
+                : Math.min(Math.round((processedEnrollmentsCount / totalOriginalEnrollments) * 100), 99);
             progressCallback({ id: "enr", percent });
           }
         } else {
-          console.error(
-            `Failed to push enrollment chunk - status: ${result.status}`,
-            result
-          );
+          console.error(`Failed to push enrollment chunk - status: ${result.status}`, result);
           // Add failed enrollments back to the list for retry
           failedEnrollments.push(...partition);
         }
@@ -219,14 +196,10 @@ const pushAndMarkOnline = async (enrollments, progressCallback) => {
     enrollmentsToProcess = failedEnrollments;
 
     if (enrollmentsToProcess.length === 0) {
-      console.log(
-        `All enrollments processed successfully after ${attempt + 1} attempts`
-      );
+      console.log(`All enrollments processed successfully after ${attempt + 1} attempts`);
       break;
     } else if (attempt === chunkSizes.length - 1) {
-      console.error(
-        `Failed to process ${enrollmentsToProcess.length} enrollments after all retry attempts`
-      );
+      console.error(`Failed to process ${enrollmentsToProcess.length} enrollments after all retry attempts`);
     }
   }
 
@@ -298,4 +271,9 @@ export const findOne = async (id) => {
   } catch (error) {
     console.error(`Failed to get enrollment`, error);
   }
+};
+
+export const clearTable = async () => {
+  console.log("clearing Enrollment table...");
+  return await db[TABLE_NAME].clear();
 };
