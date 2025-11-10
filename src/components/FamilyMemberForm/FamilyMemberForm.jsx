@@ -170,9 +170,14 @@ const FamilyMemberForm = ({
 
     switch (code) {
       // handle form validation on besis of DOB
-      case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB:
+      case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB: 
+      case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO:
+        const sex = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX];
+        const transferTo =  data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO]
+
         const age = calculateAge(value);
         data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE] = age;
+        
 
         if (age < 15 || age > 69) {
           metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
@@ -264,6 +269,45 @@ const FamilyMemberForm = ({
           ].hidden = false;
           metadata[
             MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
+          ].hidden = false;
+        }
+        if (
+          sex == TYPE_OF_ACTION.FEMALE &&
+          age > 15 &&
+          age < 49 &&
+          transferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY
+        ) {
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
+          ].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
+          ].hidden = true;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
+          ].hidden = true;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION
+          ].hidden = false; 
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
+          ].hidden = true;
+        } else {
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
+          ].hidden = false;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = false;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = false;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
+          ].hidden = false;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
+          ].hidden = false;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
           ].hidden = false;
         }
 
@@ -528,10 +572,11 @@ const FamilyMemberForm = ({
             break;
         }
         break;
-
-      // handle form validation on besis of membership gender
+// handle form validation on besis of membership gender
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX:
         const userAge = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE];
+        const dataSex = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX];
+        const dataTransferTo =  data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO]
 
         switch (value) {
           case TYPE_OF_ACTION.MALE:
@@ -716,6 +761,46 @@ const FamilyMemberForm = ({
           default:
             break;
         }
+         if (
+          dataSex == TYPE_OF_ACTION.FEMALE &&
+          userAge > 15 &&
+          userAge < 49 &&
+          dataTransferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY
+        ) {
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
+          ].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
+          ].hidden = true;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
+          ].hidden = true;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION
+          ].hidden = false; 
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
+          ].hidden = true;
+        } else {
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
+          ].hidden = false;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = false;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = false;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
+          ].hidden = false;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
+          ].hidden = false;
+          metadata[
+            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
+          ].hidden = false;
+        }
+
         break;
 
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_DIDSHE_PREGNENT:
@@ -745,50 +830,6 @@ const FamilyMemberForm = ({
             ].fileds[item].hidden = false;
           });
         }
-        break;
-
-      // handle the form validation on the besis of tranferd ot filed
-      case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANFER_TO:
-        const sex = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX];
-        const useAge = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE];
-
-        if (
-          sex == TYPE_OF_ACTION.FEMALE &&
-          useAge > 15 &&
-          useAge < 49 &&
-          value == FAMILY_MEMBER_VALUE.EX_COUNTRY
-        ) {
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
-          ].hidden = true;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION
-          ].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
-          ].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
-          ].hidden = true;
-        } else if (
-          sex == TYPE_OF_ACTION.FEMALE &&
-          (useAge < 15 || useAge > 49) &&
-          value == FAMILY_MEMBER_VALUE.EX_COUNTRY
-        ) {
-          for (let meta in metadata) {
-            metadata[meta].hidden = true;
-          }
-        } else if (
-          sex == TYPE_OF_ACTION.MALE &&
-          value == FAMILY_MEMBER_VALUE.EX_COUNTRY
-        ) {
-          for (let meta in metadata) {
-            metadata[meta].hidden = true;
-          }
-        }
-
         break;
 
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CURRENT_MARITAL_STATUS:

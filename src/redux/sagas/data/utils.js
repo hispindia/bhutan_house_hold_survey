@@ -131,6 +131,9 @@ const convertValueBack = (valueType, value) => {
     case "EMAIL":
     case "LONG_TEXT":
     case "COORDINATE":
+      if (/^0+$/.test(value) && value.length > 1) {
+          value = "0";
+      }
       return value ? value + "" : "";
     case "NUMBER":
       return value;
