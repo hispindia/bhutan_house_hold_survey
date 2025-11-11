@@ -163,18 +163,80 @@ const FamilyMemberForm = ({
     data,
     code,
     value,
-    sectionKey
+    sectionKey, 
+    caseStop,
   ) => {
     // keep selected member details
     console.log("editRowCallback clicked", data, code, value);
 
+     if(!data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS]) {
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.MEMBERSHIP_STATUS].fields[
+        FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO
+      ].hidden = true;
+    }
+
+    if(!data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS]) {
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION].hidden = true;
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT].hidden = true;
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE].hidden = true;
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = true;
+      metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
+    }
+
     switch (code) {
+
+      case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO: 
+        const trasnferToSex = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX];
+        const transferTo = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO];
+        const transferToDOB = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB];
+        const transferToAge = calculateAge(transferToDOB);
+        if(!transferTo && (transferToAge || trasnferToSex)) break;
+        
+        if (trasnferToSex == TYPE_OF_ACTION.FEMALE && transferToAge > 15 && transferToAge < 49 && transferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY) {
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = false;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
+
+        } else if ((trasnferToSex == TYPE_OF_ACTION.MALE && transferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY) || (trasnferToSex == TYPE_OF_ACTION.FEMALE && transferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY)) {
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION].hidden = true;
+          metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].hidden = true;
+        } else {
+          editRowCallback(
+            metadata,
+            previousData,
+            data,
+            FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB,
+            data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB],
+            sectionKey,
+            true
+          );
+
+          editRowCallback(
+            metadata,
+            previousData,
+            data,
+            FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX,
+            data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX],
+            sectionKey,
+            true
+          );
+        }
+
+      break;
+
       // handle form validation on besis of DOB
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.DOB: 
-      case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO:
-        const sex = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX];
-        const transferTo =  data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO]
-
         const age = calculateAge(value);
         data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE] = age;
         
@@ -271,44 +333,16 @@ const FamilyMemberForm = ({
             MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
           ].hidden = false;
         }
-        if (
-          sex == TYPE_OF_ACTION.FEMALE &&
-          age > 15 &&
-          age < 49 &&
-          transferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY
-        ) {
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
-          ].hidden = true;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
-          ].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
-          ].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION
-          ].hidden = false; 
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
-          ].hidden = true;
-        } else {
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
-          ].hidden = false;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = false;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = false;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
-          ].hidden = false;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
-          ].hidden = false;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
-          ].hidden = false;
+        
+        if(!caseStop) {
+          editRowCallback(
+            metadata,
+            previousData,
+            data,
+            FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO,
+            data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO],
+            sectionKey
+          );
         }
 
         break;
@@ -497,6 +531,12 @@ const FamilyMemberForm = ({
 
             break;
 
+          case FAMILY_MEMBER_VALUE.TRANSFERRED:
+            metadata[MEMBER_FORM_VALIDATIONS_SECTION.MEMBERSHIP_STATUS].fields[
+              FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO
+            ].hidden = false;
+          break;
+
           default:
             metadata[
               MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
@@ -514,9 +554,6 @@ const FamilyMemberForm = ({
             ].hidden = true;
 
             // for else
-            metadata[MEMBER_FORM_VALIDATIONS_SECTION.MEMBERSHIP_STATUS].fields[
-              FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO
-            ].hidden = false;
             metadata[MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2].fields[
               FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_2_NCDMODULE_INDIVIDUAL
             ].hidden = false;
@@ -575,8 +612,6 @@ const FamilyMemberForm = ({
 // handle form validation on besis of membership gender
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX:
         const userAge = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.AGE];
-        const dataSex = data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.SEX];
-        const dataTransferTo =  data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO]
 
         switch (value) {
           case TYPE_OF_ACTION.MALE:
@@ -758,49 +793,18 @@ const FamilyMemberForm = ({
 
             break;
 
-          default:
-            break;
-        }
-         if (
-          dataSex == TYPE_OF_ACTION.FEMALE &&
-          userAge > 15 &&
-          userAge < 49 &&
-          dataTransferTo == FAMILY_MEMBER_VALUE.EX_COUNTRY
-        ) {
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
-          ].hidden = true;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = true;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
-          ].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
-          ].hidden = true;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MOTHER_CHILD_SECTION
-          ].hidden = false; 
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
-          ].hidden = true;
-        } else {
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.MORTALITY_INFORMATION
-          ].hidden = false;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.DEMOGRAPHIC].hidden = false;
-          metadata[MEMBER_FORM_VALIDATIONS_SECTION.WG_SORT].hidden = false;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHYSICAL_MEASUREMENT
-          ].hidden = false;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.BLOOD_PRESSURE
-          ].hidden = false;
-          metadata[
-            MEMBER_FORM_VALIDATIONS_SECTION.PHASE_2
-          ].hidden = false;
         }
 
+        if(!caseStop) {
+          editRowCallback(
+            metadata,
+            previousData,
+            data,
+            FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO,
+            data[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.TRANSFER_TO],
+            sectionKey
+          );
+        }
         break;
 
       case FAMILY_MEMBER_METADATA_CUSTOMUPDATE.HHM_DIDSHE_PREGNENT:
