@@ -43,7 +43,7 @@ export const convertAttributesToForm = (programMetadataMember) => {
 
         collectdAttributes[pSection.displayName] = {
             hidden: false,
-            fileds: _.cloneDeep(TEIFormMetadata).reduce((obj, md) => {
+            fields: _.cloneDeep(TEIFormMetadata).reduce((obj, md) => {
                 md.permanentDisabled = defaultProgramTrackedEntityAttributeDisable.includes(md.id);
                 md.disabled = false;
                 obj[md.code] = md;
@@ -73,7 +73,7 @@ export const convertAttributesToForm = (programMetadataMember) => {
 
             collectdAttributes[pSection.displayName] = {
                 hidden: false,
-                fileds: _.cloneDeep(programFormMetadata).reduce((obj, md) => {
+                fields: _.cloneDeep(programFormMetadata).reduce((obj, md) => {
                     md.permanentDisabled = defaultProgramTrackedEntityAttributeDisable.includes(md.id);
                     md.disabled = false;
                     obj[md.code] = md;

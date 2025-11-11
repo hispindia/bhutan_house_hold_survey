@@ -161,7 +161,7 @@ const useForm = (data, uiLocale) => {
       valText
     );
 
-    // custom fileds validations
+    // custom fields validations
     setValidationText(valText);
 
     return _.isEmpty(valText);

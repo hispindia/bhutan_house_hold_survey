@@ -343,7 +343,7 @@ const CascadeTable = (props) => {
       modifiedForms[MEMBER_FORM_VALIDATIONS_SECTION.WAISE_HIP_CIRCUMFERENCE].hidden = true;
     }
 
-    // handle fileds for previous value
+    // handle fields for previous value
     Object.entries(selectedData).forEach(([key, value]) => {
       editRowCallback(modifiedForms, {}, selectedData, key, value);
     });

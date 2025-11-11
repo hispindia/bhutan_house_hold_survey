@@ -161,7 +161,7 @@ function CaptureForm(props) {
                     <h5 class="card-title">{mItem}</h5>
                     <p class="card-text">
                       <div className="row">
-                        {generateFields(formAttrMetaData[mItem].fileds, mItem)}
+                        {generateFields(formAttrMetaData[mItem].fields, mItem)}
                       </div>
                     </p>
                   </div>
