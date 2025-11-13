@@ -67,6 +67,11 @@ export const convertValue = (valueType, value) => {
   }
 };
 
+const isValidDate = (date) => {
+  return date && moment(date).isValid();
+};
+
+
 export const convertValueBack = (valueType, value) => {
   switch (valueType) {
     case "TEXT":

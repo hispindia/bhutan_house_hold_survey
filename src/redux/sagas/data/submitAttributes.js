@@ -67,7 +67,7 @@ function* handleSubmitAttributes({ attributes }) {
 }
 
 function* makePayload(attributes) {
-  debugger
+  
   const data = yield select((state) => state.data.tei.data);
   const programMetadata = yield select(
     (state) => state.metadata.programMetadata
