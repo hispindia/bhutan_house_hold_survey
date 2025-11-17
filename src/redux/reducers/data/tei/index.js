@@ -11,6 +11,7 @@ import {
   GET_TEI_ERROR_MESSAGE,
   IS_EDITING_ATTRIBUTES,
   LOAD_TEI,
+  LOAD_SUBMIT_EVENT,
   SET_PARENT_OU_PATTERN,
 } from "../../../types/data/tei";
 import currentTei from "./currentTei";
@@ -28,6 +29,17 @@ const data = combineReducers({
 const loading = (state = false, { type, ...args }) => {
   switch (type) {
     case LOAD_TEI:
+      return args.loading;
+    case CLEAR:
+      return false;
+    default:
+      return state;
+  }
+};
+
+const submitEventLoading = (state = false, { type, ...args }) => {
+  switch (type) {
+    case LOAD_SUBMIT_EVENT:
       return args.loading;
     case CLEAR:
       return false;
@@ -72,7 +84,7 @@ const currentTab = (state = "1", { type, ...agrs }) => {
       return state;
   }
 };
-const ouPattern = (state = null, { type,payload, ...agrs }) => {
+const ouPattern = (state = null, { type, payload, ...agrs }) => {
   switch (type) {
     case SET_PARENT_OU_PATTERN:
       return payload.pattern;
@@ -123,6 +135,7 @@ const success = (state = null, { type, ...args }) => {
 
 export default combineReducers({
   loading,
+  submitEventLoading,
   data,
   error,
   isEditingAttributes,
@@ -130,5 +143,5 @@ export default combineReducers({
   selectedYear,
   selectedMember,
   success,
-  ouPattern
+  ouPattern,
 });

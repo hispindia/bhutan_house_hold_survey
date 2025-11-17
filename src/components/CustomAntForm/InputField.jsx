@@ -2,9 +2,9 @@ import { onKeyDown } from "@/utils";
 import { Checkbox, DatePicker, Input, Radio, Select } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import weekday from "dayjs/plugin/weekday"; 
+import weekday from "dayjs/plugin/weekday";
 import localeData from "dayjs/plugin/localeData";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(weekday);
@@ -75,8 +75,7 @@ const InputField = ({
 
     case "TEXT":
     case "EMAIL":
-   case "COORDINATE": 
-      
+    case "COORDINATE":
       return (
         <Input
           // addonBefore={addonBefore}
@@ -112,7 +111,6 @@ const InputField = ({
         />
       );
     case "YEAR":
-      console.log("year",props)
       return (
         <DatePicker
           picker="year"
@@ -169,7 +167,7 @@ const InputField = ({
       console.log("onChange", props.onChange);
       return null;
     }
-    //  case "COORDINATE": 
+    //  case "COORDINATE":
     //  {
 
     //   console.log("tttttttttttt",props );
@@ -183,10 +181,10 @@ const InputField = ({
     //         {...props}
     //       // value={props.value ? dayjs(props.value) : ""}
     //         // readOnly
-    //       /> 
+    //       />
     //   );
     // }
-   
+
     default:
       return <span>UNSUPPORTED VALUE TYPE</span>;
   }

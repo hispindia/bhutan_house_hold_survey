@@ -11,6 +11,7 @@ import {
   GET_TEI_SUCCESS_MESSAGE,
   GET_TEI_ERROR_MESSAGE,
   LOAD_TEI,
+  LOAD_SUBMIT_EVENT,
   CHANGE_EVENT_FAMILY,
   CLONE_EVENT,
   UPDATE_EVENT_DATE,
@@ -54,6 +55,11 @@ const getTeiErrorMessage = (message) => ({
 
 const loadTei = (loading) => ({
   type: LOAD_TEI,
+  loading,
+});
+
+const loadSubmitEvent = (loading) => ({
+  type: LOAD_SUBMIT_EVENT,
   loading,
 });
 
@@ -109,6 +115,7 @@ export {
   getTeiSuccess,
   getCascadeSuccess,
   loadTei,
+  loadSubmitEvent,
   clear,
   getTeiSuccessMessage,
   getTeiErrorMessage,

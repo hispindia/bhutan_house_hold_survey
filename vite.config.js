@@ -9,7 +9,13 @@ import * as path from "path";
 export default defineConfig({
   base: "./",
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [
+          ['@babel/plugin-proposal-optional-chaining-assign', { version: '2023-07' }]
+        ]
+      }
+    }),
     splitVendorChunkPlugin(),
     VitePWA({
       manifest,

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Form, Row } from "antd";
-import tableRenderData from "@/components/CensusDetailForm/houseServey";
-import { useSelector } from "react-redux";
-import _ from "lodash";
 import { metadataApi } from "@/api";
+import tableRenderData from "@/components/CensusDetailForm/houseServey";
+import { Form } from "antd";
+import _ from "lodash";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const useHouseholdSurveyForm = (values) => {
   const [form] = Form.useForm();
@@ -20,9 +20,7 @@ const useHouseholdSurveyForm = (values) => {
     "rWCn0WGoAeS",
   ];
 
-  const selectedOuPath = useSelector(
-    (state) => state.metadata.selectedOrgUnit.path
-  );
+  const selectedOuPath = useSelector((state) => state.metadata.selectedOrgUnit.path);
 
   useEffect(() => {
     (async () => {
@@ -83,10 +81,7 @@ const useHouseholdSurveyForm = (values) => {
         // values['NPb0hOBn6g9'] = value
         form.setFieldsValue(values);
       } else if (uuid == "a0t6coJR4bG") {
-        let dwelling = [
-          "Pipe in compound but outside the dwelling",
-          "Piped in dwelling",
-        ];
+        let dwelling = ["Pipe in compound but outside the dwelling", "Piped in dwelling"];
 
         if (value == "Pipe in compound but outside the dwelling") {
           values["lRVDgo5HwYe"] = "In own compound, yard/plot";
@@ -112,8 +107,7 @@ const useHouseholdSurveyForm = (values) => {
         }
       } else if (uuid == "lRVDgo5HwYe") {
         console.trace("first");
-        if (value != "Elsewhere")
-          values["ADGaCK23IbP"] = "Less than or equal to 30 minutes";
+        if (value != "Elsewhere") values["ADGaCK23IbP"] = "Less than or equal to 30 minutes";
         else values["ADGaCK23IbP"] = null;
         form.setFieldsValue(values);
       } else if (uuid == "YGisOzETviK") {
@@ -137,11 +131,7 @@ const useHouseholdSurveyForm = (values) => {
         ];
         if (value == "No facility/bush/field") {
           tableRenderData.forEach((item) => {
-            if (
-              item.uid == "ySLtaPSULVN" ||
-              item.uid == "RIqHmgT1OWu" ||
-              item.uid == "rlecl6N9HcX"
-            ) {
+            if (item.uid == "ySLtaPSULVN" || item.uid == "RIqHmgT1OWu" || item.uid == "rlecl6N9HcX") {
               item.hidden = true;
             }
           });
@@ -155,11 +145,7 @@ const useHouseholdSurveyForm = (values) => {
         // }
         else if (ifExist.includes(value)) {
           tableRenderData.forEach((item) => {
-            if (
-              item.uid == "ySLtaPSULVN" ||
-              item.uid == "rlecl6N9HcX" ||
-              item.uid == "RIqHmgT1OWu"
-            ) {
+            if (item.uid == "ySLtaPSULVN" || item.uid == "rlecl6N9HcX" || item.uid == "RIqHmgT1OWu") {
               item.hidden = false;
             }
           });
@@ -172,11 +158,7 @@ const useHouseholdSurveyForm = (values) => {
           values["ySLtaPSULVN"] = null;
         } else {
           tableRenderData.forEach((item) => {
-            if (
-              item.uid == "ySLtaPSULVN" ||
-              item.uid == "RIqHmgT1OWu" ||
-              item.uid == "rlecl6N9HcX"
-            ) {
+            if (item.uid == "ySLtaPSULVN" || item.uid == "RIqHmgT1OWu" || item.uid == "rlecl6N9HcX") {
               item.hidden = false;
             }
           });
@@ -216,11 +198,7 @@ const useHouseholdSurveyForm = (values) => {
           });
         }
       } else if (uuid == "R0AYFvHFg6u") {
-        let ifExist = [
-          "No handwashing place in dwelling/yard/plot",
-          "No permission to see",
-          "Other reasons",
-        ];
+        let ifExist = ["No handwashing place in dwelling/yard/plot", "No permission to see", "Other reasons"];
         if (ifExist.includes(value)) {
           tableRenderData.forEach((item) => {
             if (item.uid == "d4VMT4orArm" || item.uid == "Ju3AkdRHT52") {
@@ -238,14 +216,7 @@ const useHouseholdSurveyForm = (values) => {
         }
         form.setFieldsValue(values);
       } else if (uuid == "GtSSMCc6nXz") {
-        let ifExist = [
-          "Ojvu6krZKBX",
-          "WTFyAoDjI4X",
-          "S4G690Rx8KD",
-          "FL0F1NaV4e2",
-          "b60lyh4IRgb",
-          "rWCn0WGoAeS",
-        ];
+        let ifExist = ["Ojvu6krZKBX", "WTFyAoDjI4X", "S4G690Rx8KD", "FL0F1NaV4e2", "b60lyh4IRgb", "rWCn0WGoAeS"];
         if (value == "false") {
           tableRenderData.forEach((item) => {
             if (ifExist.includes(item.uid)) {

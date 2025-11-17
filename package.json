@@ -1,7 +1,7 @@
 {
   "name": "vite-pwa-fi",
   "private": true,
-  "version": "0.0.8",
+  "version": "0.0.10",
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/bump-version.js",
@@ -14,10 +14,7 @@
     "bump:major": "node scripts/bump-version.js major"
   },
   "dependencies": {
-    "@dhis2/ui-widgets": "^6.24.0",
     "@ant-design/colors": "^7.2.1",
-    "prop-types": "^15.8.1",
-    "history": "^4.10.1",
     "@ant-design/icons": "^5.2.6",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@date-io/date-fns": "1.x",
@@ -25,6 +22,7 @@
     "@dhis2/app-runtime": "^2.2.2",
     "@dhis2/d2-i18n": "^1.0.6",
     "@dhis2/ui": "^5.6.1",
+    "@dhis2/ui-widgets": "^6.24.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.9",
@@ -54,6 +52,7 @@
     "file-loader": "^6.2.0",
     "highcharts": "^8.2.0",
     "highcharts-react-official": "^3.0.0",
+    "history": "^4.10.1",
     "html-webpack-plugin": "^5.5.3",
     "i18next": "^19.6.3",
     "jspdf": "^2.5.1",
@@ -66,6 +65,7 @@
     "notistack": "^1.0.0",
     "npm": "^11.5.2",
     "prettier": "^2.2.1",
+    "prop-types": "^15.8.1",
     "qs": "^6.9.4",
     "query-string": "^7.0.0",
     "react": "18.2.0",
@@ -102,6 +102,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining-assign": "^7.27.1",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^1.3.0",

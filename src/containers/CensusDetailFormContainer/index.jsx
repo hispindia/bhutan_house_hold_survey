@@ -16,12 +16,8 @@ const getHalfYear = (selected6Month, year) => {
 };
 
 const CensusDetailFormContainer = () => {
-  const currentEvents = useSelector(
-    (state) => state.data.tei.data.currentEvents
-  );
-  const { year, index, selected6Month } = useSelector(
-    (state) => state.data.tei.selectedYear
-  );
+  const currentEvents = useSelector((state) => state.data.tei.data.currentEvents);
+  const { year, index, selected6Month } = useSelector((state) => state.data.tei.selectedYear);
 
   const { startDate, endDate } = getHalfYear(selected6Month, year);
 
@@ -53,7 +49,8 @@ const CensusDetailFormContainer = () => {
             dueDate: `${endDate}`,
             status: "ACTIVE",
             dataValues: eventDataValues,
-          })
+          }),
+          false
         )
       );
       return;
@@ -65,7 +62,8 @@ const CensusDetailFormContainer = () => {
             ...currentEvent,
             _isDirty: true,
             dataValues: eventDataValues,
-          })
+          }),
+          false
         )
       );
     }

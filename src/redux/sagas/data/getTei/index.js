@@ -3,11 +3,7 @@ import * as trackedEntityManager from "@/indexDB/TrackedEntityManager/TrackedEnt
 import { call, put, select, takeLatest } from "redux-saga/effects";
 import { dataApi } from "../../../../api";
 import { editingAttributes } from "../../../actions/data";
-import {
-  getTeiError,
-  getTeiSuccessMessage,
-  loadTei,
-} from "../../../actions/data/tei";
+import { getTeiError, getTeiSuccessMessage, loadTei } from "../../../actions/data/tei";
 import { setSelectedOrgUnit } from "../../../actions/metadata";
 import { GET_TEI } from "../../../types/data/tei";
 import { getSelectedOrgUnitByOuId, getTeiId } from "../utils";
@@ -38,9 +34,7 @@ function* handleGetTei() {
       yield call(initExistedDataSaga, teiId);
       yield put(getTeiSuccessMessage(`Get tracked entity instance: ${teiId}`));
     } else {
-      const selectedOu = yield select(
-        (state) => state.metadata.selectedOrgUnit
-      );
+      const selectedOu = yield select((state) => state.metadata.selectedOrgUnit);
       if (!selectedOu) {
         return yield put(push("/"));
       }
@@ -70,20 +64,13 @@ function* initExistedDataSaga() {
   // OFFLINE MODE
   if (offlineStatus) {
     // clone new data object
-    familyTeiDate = yield call(
-      trackedEntityManager.getTrackedEntityInstanceById,
-      {
-        trackedEntity: teiId,
-        program: programId,
-      }
-    );
+    familyTeiDate = yield call(trackedEntityManager.getTrackedEntityInstanceById, {
+      trackedEntity: teiId,
+      program: programId,
+    });
   } else {
     // get Family TEI
-    familyTeiDate = yield call(
-      dataApi.getTrackedEntityInstanceById,
-      teiId,
-      programId
-    );
+    familyTeiDate = yield call(dataApi.getTrackedEntityInstanceById, teiId, programId);
   }
 
   console.log("initExistedDataSaga", { familyTeiDate });
@@ -117,23 +104,15 @@ function* initExistedDataSaga() {
 
   // get by event query
   let memberTEIsEvents = null;
-  console.log({ memberTEIsUid });
 
   if (memberTEIsUid && memberTEIsUid.length > 0) {
     if (offlineStatus) {
-      memberTEIsEvents = yield call(
-        trackedEntityManager.getTrackedEntityInstancesByIDs,
-        {
-          program: "xvzrp56zKvI",
-          trackedEntities: memberTEIsUid,
-        }
-      );
+      memberTEIsEvents = yield call(trackedEntityManager.getTrackedEntityInstancesByIDs, {
+        program: "xvzrp56zKvI",
+        trackedEntities: memberTEIsUid,
+      });
     } else {
-      memberTEIsEvents = yield call(
-        dataApi.getAllTrackedEntityInstancesByIDs,
-        "xvzrp56zKvI",
-        memberTEIsUid
-      );
+      memberTEIsEvents = yield call(dataApi.getAllTrackedEntityInstancesByIDs, "xvzrp56zKvI", memberTEIsUid);
     }
   }
 

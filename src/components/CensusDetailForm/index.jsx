@@ -1,37 +1,23 @@
+import SideBarContainer from "@/containers/SideBar";
+import withDhis2FormItem from "@/hocs/withDhis2Field";
+import useHouseholdSurveyForm from "@/hooks/useHouseholdSurveyForm";
 import { Button, Col, Form, Row, Table, Tabs } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import SideBarContainer from "@/containers/SideBar";
-import withDhis2FormItem from "@/hocs/withDhis2Field";
 import CFormControl from "../CustomAntForm/CFormControl";
 import InputField from "../InputField";
-import useHouseholdSurveyForm from "@/hooks/useHouseholdSurveyForm";
+import SavingIndicator from "./SavingIndicator";
 
 /* style */
-import "./index.css";
 import { debounce } from "lodash";
-import { getEventByYearAndHalt6Month } from "@/utils/event";
+import "./index.css";
 
 const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
-  const dataElements = useSelector(
-    (state) => state.metadata.programMetadata.programStages[0].dataElements
-  );
+  const dataElements = useSelector((state) => state.metadata.programMetadata.programStages[0].dataElements);
   const events = useSelector((state) => state.data.tei.data.currentEvents);
-
-  const selectedYear = useSelector((state) => state.data.tei.selectedYear);
-
-  const eventData = getEventByYearAndHalt6Month(
-    events,
-    selectedYear.year,
-    selectedYear.selected6Month
-  );
-
-  const Dhis2FormItem = useMemo(
-    () => withDhis2FormItem(dataElements)(CFormControl),
-    [dataElements]
-  );
-
+  const submitEventLoading = useSelector((state) => state.data.tei.submitEventLoading);
+  const Dhis2FormItem = useMemo(() => withDhis2FormItem(dataElements)(CFormControl), [dataElements]);
   const { form, surveyList, loadServeyFields } = useHouseholdSurveyForm(values);
 
   const { t } = useTranslation();
@@ -100,6 +86,18 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
     setFormData({ ...formData, [id]: value });
   };
 
+  const handleChange = debounce(() => {
+    loadServeyFields();
+    form
+      .validateFields()
+      .then((fieldsValue) => {
+        onSubmit(fieldsValue);
+      })
+      .catch((error) => {
+        console.log("Validation errors on change:", error);
+      });
+  }, 1000);
+
   useEffect(() => {
     loadServeyFields();
   }, []);
@@ -155,42 +153,18 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
             key: index,
             label: name,
             input1: (
-              <Dhis2FormItem
-                hidden={hidden}
-                displayFormName={t("some")}
-                id={some}
-              >
-                <InputField
-                  value={formData[uid] || ""}
-                  hidden={permanentHide == true ? true : hidden}
-                  size="small"
-                />
+              <Dhis2FormItem hidden={hidden} displayFormName={t("some")} id={some}>
+                <InputField value={formData[uid] || ""} hidden={permanentHide == true ? true : hidden} size="small" />
               </Dhis2FormItem>
             ),
             input2: (
-              <Dhis2FormItem
-                hidden={hidden}
-                displayFormName={t("alot")}
-                id={alot}
-              >
-                <InputField
-                  value={formData[uid] || ""}
-                  hidden={permanentHide == true ? true : hidden}
-                  size="small"
-                />
+              <Dhis2FormItem hidden={hidden} displayFormName={t("alot")} id={alot}>
+                <InputField value={formData[uid] || ""} hidden={permanentHide == true ? true : hidden} size="small" />
               </Dhis2FormItem>
             ),
             input3: (
-              <Dhis2FormItem
-                hidden={hidden}
-                displayFormName={t(thirdRowTitle)}
-                id={thirdRowId}
-              >
-                <InputField
-                  value={formData[uid] || ""}
-                  hidden={permanentHide == true ? true : hidden}
-                  size="small"
-                />
+              <Dhis2FormItem hidden={hidden} displayFormName={t(thirdRowTitle)} id={thirdRowId}>
+                <InputField value={formData[uid] || ""} hidden={permanentHide == true ? true : hidden} size="small" />
               </Dhis2FormItem>
             ),
           };
@@ -204,21 +178,24 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
       key: 1,
       label: ``,
       children: (
-        <Table
-          size="small"
-          bordered
-          pagination={false}
-          showHeader={false}
-          dataSource={dataSource}
-          columns={columns}
-        />
+        <div style={{ position: "relative" }}>
+          <SavingIndicator loading={submitEventLoading} />
+          <Table
+            size="small"
+            bordered
+            pagination={false}
+            showHeader={false}
+            dataSource={dataSource}
+            columns={columns}
+          />
+        </div>
       ),
     },
   ];
 
   return (
     <Form
-      onFieldsChange={debounce(loadServeyFields, 1000)}
+      onFieldsChange={handleChange}
       initialValues={values}
       form={form}
       onFinish={(fieldsValue) => {
@@ -246,12 +223,7 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
 
         {events && events.length > 0 ? (
           <Col className="rightBar">
-            <Tabs
-              defaultActiveKey="1"
-              size="small"
-              items={items}
-              onChange={onTabChange}
-            />
+            <Tabs defaultActiveKey="1" size="small" items={items} onChange={onTabChange} />
             <Button
               type="primary"
               className="mt-2"

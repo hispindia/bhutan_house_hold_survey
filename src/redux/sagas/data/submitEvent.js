@@ -1,20 +1,10 @@
 import { call, put, select, takeLatest } from "redux-saga/effects";
 import { dataApi } from "../../../api";
-import {
-  CLONE_EVENT,
-  SUBMIT_EVENT,
-  SUBMIT_EVENTS,
-  UPDATE_EVENT_DATE,
-} from "../../types/data/tei";
+import { CLONE_EVENT, SUBMIT_EVENT, SUBMIT_EVENTS, UPDATE_EVENT_DATE } from "../../types/data/tei";
 import { generateTEIDhis2Payload, getCurrentEvent } from "./utils";
 import { transformEvent } from "@/utils/event";
 
-import {
-  getTei,
-  getTeiError,
-  getTeiSuccessMessage,
-  loadTei,
-} from "../../actions/data/tei";
+import { getTei, getTeiError, getTeiSuccessMessage, loadTei, loadSubmitEvent } from "../../actions/data/tei";
 import { updateCascade } from "../../actions/data/tei/currentCascade";
 import { updateEvents } from "../../actions/data/tei/currentEvent";
 
@@ -25,10 +15,14 @@ import * as eventManager from "@/indexDB/EventManager/EventManager";
 import * as trackedEntityManager from "@/indexDB/TrackedEntityManager/TrackedEntityManager";
 import { calculateDataElements } from "@/components/FamilyMemberForm/FormCalculationUtils";
 
-function* handleSubmitEvent({ event }) {
+function* handleSubmitEvent({ event, doRefresh = true }) {
   const { offlineStatus } = yield select((state) => state.common);
 
-  yield put(loadTei(true));
+  yield put(loadSubmitEvent(true));
+
+  if (doRefresh) {
+    yield put(loadTei(true));
+  }
   const { currentTei } = yield select((state) => state.data.tei.data);
 
   try {
@@ -44,8 +38,11 @@ function* handleSubmitEvent({ event }) {
     yield put(getTeiError(e.message));
   } finally {
     // refresh TEI
-    yield put(getTei(currentTei.trackedEntity));
+    if (doRefresh) {
+      yield put(getTei(currentTei.trackedEntity));
+    }
     yield put(loadTei(false));
+    yield put(loadSubmitEvent(false));
   }
 }
 
@@ -86,11 +83,9 @@ function* handleCloneEvent({ year }) {
   console.log("handleCloneEvent", { year });
 
   yield put(loadTei(true));
-  const { currentEvents, currentTei, currentEnrollment, currentCascade } =
-    yield select((state) => state.data.tei.data);
+  const { currentEvents, currentTei, currentEnrollment, currentCascade } = yield select((state) => state.data.tei.data);
 
-  const { selectedOrgUnit, programMetadata, programMetadataMember } =
-    yield select((state) => state.metadata);
+  const { selectedOrgUnit, programMetadata, programMetadataMember } = yield select((state) => state.metadata);
 
   function* getLastestEvent(paramEvents = []) {
     let tempEvents = currentEvents.length > 0 ? currentEvents : paramEvents;
@@ -123,30 +118,23 @@ function* handleCloneEvent({ year }) {
     // dataValues = JSON.parse(JSON.stringify(previousEvent.dataValues));
 
     // only pick dataValues that is in calculateDataElements
-    previousEvent.dataValues = Object.entries(previousEvent.dataValues).reduce(
-      (acc, [key, value]) => {
-        if (calculateDataElements.includes(key)) {
-          acc[key] = value;
-        }
-        return acc;
-      },
-      {}
-    );
+    previousEvent.dataValues = Object.entries(previousEvent.dataValues).reduce((acc, [key, value]) => {
+      if (calculateDataElements.includes(key)) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
 
     payloadTransformed = yield call(transformEvent, {
       dataValues: { ...previousEvent.dataValues },
     });
     const previousEventYear = moment(previousEvent.occurredAt).year();
     // Clone cascadeDataValue
-    cascadeDataValue = JSON.parse(
-      JSON.stringify(currentCascade[previousEventYear])
-    );
+    cascadeDataValue = JSON.parse(JSON.stringify(currentCascade[previousEventYear]));
 
     if (cascadeDataValue) {
       let cascadeData = cascadeDataValue;
-      cascadeData = cascadeData.filter(
-        (e) => e["status"] != "dead" && e["status"] != "transfer-out"
-      );
+      cascadeData = cascadeData.filter((e) => e["status"] != "dead" && e["status"] != "transfer-out");
 
       cascadeData.forEach((e) => {
         if (e["age"] != "" && e["agetype"] == "age") {
@@ -193,9 +181,7 @@ function* handleCloneEvent({ year }) {
       newFamilyEvents.forEach((newFamilyEvent) => {
         if (
           newFamilyEvent.dataValues.length == 0 &&
-          newFamilyEvent.dataValues.findIndex(
-            (e) => e.dataElement === "nI7lkHCG6tv"
-          ) < 0
+          newFamilyEvent.dataValues.findIndex((e) => e.dataElement === "nI7lkHCG6tv") < 0
         ) {
           // nI7lkHCG6tv is a the chosen dataElement for this case
           newFamilyEvent.dataValues.push({
@@ -219,9 +205,7 @@ function* handleCloneEvent({ year }) {
 
     // Clone member events
     // get Members TEI
-    const memberTEIsUid = cascadeDataValue
-      ? cascadeDataValue.map((r) => r.id)
-      : null;
+    const memberTEIsUid = cascadeDataValue ? cascadeDataValue.map((r) => r.id) : null;
 
     console.log("Clone member events", { memberTEIsUid });
 
@@ -229,34 +213,23 @@ function* handleCloneEvent({ year }) {
       let memberTEIsEvents = null;
 
       if (offlineStatus) {
-        memberTEIsEvents = yield call(
-          trackedEntityManager.getTrackedEntityInstancesByIDs,
-          {
-            program: "xvzrp56zKvI",
-            trackedEntities: memberTEIsUid,
-          }
-        );
+        memberTEIsEvents = yield call(trackedEntityManager.getTrackedEntityInstancesByIDs, {
+          program: "xvzrp56zKvI",
+          trackedEntities: memberTEIsUid,
+        });
       } else {
-        memberTEIsEvents = yield call(
-          dataApi.getAllTrackedEntityInstancesByIDs,
-          "xvzrp56zKvI",
-          memberTEIsUid
-        );
+        memberTEIsEvents = yield call(dataApi.getAllTrackedEntityInstancesByIDs, "xvzrp56zKvI", memberTEIsUid);
       }
       console.log({ memberTEIsEvents });
 
       if (memberTEIsEvents) {
         const newFamilyEvent = newFamilyEvents[0];
 
-        const memberTEIsWithEvents = memberTEIsEvents
-          ? memberTEIsEvents.instances
-          : [];
+        const memberTEIsWithEvents = memberTEIsEvents ? memberTEIsEvents.instances : [];
 
         let updatedMemberTeis = [];
         for (let cas of cascadeDataValue) {
-          let aTEI = memberTEIsWithEvents.find(
-            (e) => e.trackedEntity == cas.id
-          );
+          let aTEI = memberTEIsWithEvents.find((e) => e.trackedEntity == cas.id);
 
           // action not allow for previous year, only next year dont use
           // if (moment(aTEI.enrollments[0].occurredAt).format('YYYY') > moment(newFamilyEvent.occurredAt).format('YYYY')) return;
