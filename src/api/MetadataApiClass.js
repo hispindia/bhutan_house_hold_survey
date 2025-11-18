@@ -1,16 +1,7 @@
-import { pull } from "./Fetch";
-import dev_data from "./dev_data";
 import BaseApiClass from "./BaseApiClass";
+import { pull } from "./Fetch";
 export default class MetadataApiClass extends BaseApiClass {
-  getMe = () =>
-    pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/me",
-      { paging: false },
-      []
-    );
+  getMe = () => pull(this.baseUrl, this.username, this.password, "/api/me", { paging: false }, []);
   getOUListForMaleria = () =>
     pull(
       this.baseUrl,
@@ -22,35 +13,13 @@ export default class MetadataApiClass extends BaseApiClass {
     );
   // https://hhs.drukhmis.gov.bt/bhutan_hhs/api/29/organisationUnitGroups/iDFMrCU1rpc.json
 
-  getPrograms = () =>
-    pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/programs",
-      { paging: false },
-      []
-    );
+  getPrograms = () => pull(this.baseUrl, this.username, this.password, "/api/programs", { paging: false }, []);
 
   getHeaderBarData = async () => {
     let headerBarData = {};
     const results = await Promise.all([
-      pull(
-        this.baseUrl,
-        this.username,
-        this.password,
-        "/api/me",
-        { paging: false },
-        []
-      ),
-      pull(
-        this.baseUrl,
-        this.username,
-        this.password,
-        "/api/me/dashboard",
-        { paging: false },
-        []
-      ),
+      pull(this.baseUrl, this.username, this.password, "/api/me", { paging: false }, []),
+      pull(this.baseUrl, this.username, this.password, "/api/me/dashboard", { paging: false }, []),
       pull(
         this.baseUrl,
         this.username,
@@ -85,14 +54,7 @@ export default class MetadataApiClass extends BaseApiClass {
     //     "fields=id,code,displayName,path,children[id,code,displayName,path]",
     //   ]
     // );
-    const me = await pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/me",
-      { paging: false },
-      []
-    );
+    const me = await pull(this.baseUrl, this.username, this.password, "/api/me", { paging: false }, []);
 
     let data = {};
     data.tree = orgUnits.reduce((accumulator, currentOu) => {
@@ -136,51 +98,28 @@ export default class MetadataApiClass extends BaseApiClass {
   };
 
   getUserOrgUnits = async () => {
-    return pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/organisationUnits",
-      { paging: false },
-      [
-        "withinUserHierarchy=true",
-        "fields=id,code,path,children[id,code,displayName,path],displayName,level,parent,translations,attributeValues[attribute[id,displayName],value]",
-      ]
-    );
+    return pull(this.baseUrl, this.username, this.password, "/api/organisationUnits", { paging: false }, [
+      "withinUserHierarchy=true",
+      "fields=id,code,path,children[id,code,displayName,path],displayName,level,parent,translations,attributeValues[attribute[id,displayName],value]",
+    ]);
   };
 
   getProgramMetadata = async (program) => {
-    const p = await pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      `/api/programs/${program}`,
-      { paging: false },
-      [
-        "fields=programSections[id,name,trackedEntityAttributes,displayName],id,displayName,trackedEntityType,organisationUnits[id,displayName,code,path],programRuleVariables[name,programRuleVariableSourceType,dataElement,trackedEntityAttribute],programTrackedEntityAttributes[mandatory,displayInList,trackedEntityAttribute[id,displayName,displayFormName,displayShortName,valueType,optionSet[id]]],programStages[programStageSections[id,dataElements,displayName],id,displayName,programStageDataElements[compulsory,dataElement[translations,attributeValues,id,displayName,displayFormName,displayShortName,description,valueType,optionSet[code,name,translations,options[code,name,translations,id,displayName,attributeValues],valueType,version,displayName,id,attributeValues]]",
-      ]
-    );
+    const p = await pull(this.baseUrl, this.username, this.password, `/api/programs/${program}`, { paging: false }, [
+      "fields=programSections[id,name,trackedEntityAttributes,displayName],id,displayName,trackedEntityType,organisationUnits[id,displayName,code,path],programRuleVariables[name,programRuleVariableSourceType,dataElement,trackedEntityAttribute],programTrackedEntityAttributes[mandatory,displayInList,trackedEntityAttribute[id,displayName,displayFormName,displayShortName,valueType,optionSet[id]]],programStages[programStageSections[id,dataElements,displayName],id,displayName,programStageDataElements[compulsory,dataElement[translations,attributeValues,id,displayName,displayFormName,displayShortName,description,valueType,optionSet[code,name,translations,options[code,name,translations,id,displayName,attributeValues],valueType,version,displayName,id,attributeValues]]",
+    ]);
 
     return await this.convertProgramMetadata(p);
   };
 
   getProgramsMetadata = async () => {
-    const programs = await pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      `/api/programs`,
-      { paging: false },
-      [
-        "fields=programSections[id,name,trackedEntityAttributes,displayName],id,displayName,trackedEntityType,organisationUnits[id,displayName,code,path],programRuleVariables[name,programRuleVariableSourceType,dataElement,trackedEntityAttribute],programTrackedEntityAttributes[*,mandatory,displayInList,trackedEntityAttribute[*,id,displayName,displayFormName,displayShortName,valueType,optionSet[id,code,name,translations,attributeValues,sortOrder,options[id,code,name,translations,attributeValues,sortOrder]]]],programStages[programStageSections[id,dataElements,displayName],id,displayName,programStageDataElements[compulsory,dataElement[translations,attributeValues,id,displayName,displayFormName,displayShortName,description,valueType,optionSet[code,name,translations,options[code,name,translations,id,displayName,attributeValues],valueType,version,displayName,id,attributeValues]]",
-      ]
-    );
+    const programs = await pull(this.baseUrl, this.username, this.password, `/api/programs`, { paging: false }, [
+      "fields=programSections[id,name,trackedEntityAttributes,displayName],id,displayName,trackedEntityType,organisationUnits[id,displayName,code,path],programRuleVariables[name,programRuleVariableSourceType,dataElement,trackedEntityAttribute],programTrackedEntityAttributes[*,mandatory,displayInList,trackedEntityAttribute[*,id,displayName,displayFormName,displayShortName,valueType,optionSet[id,code,name,translations,attributeValues,sortOrder,options[id,code,name,translations,attributeValues,sortOrder]]]],programStages[programStageSections[id,dataElements,displayName],id,displayName,programStageDataElements[compulsory,dataElement[translations,attributeValues,id,displayName,displayFormName,displayShortName,description,valueType,optionSet[code,name,translations,options[code,name,translations,id,displayName,attributeValues],valueType,version,displayName,id,attributeValues]]",
+    ]);
 
     if (programs.programs) {
       for (let i = 0; i < programs.programs.length; i++) {
-        programs.programs[i] = await this.convertProgramMetadata(
-          programs.programs[i]
-        );
+        programs.programs[i] = await this.convertProgramMetadata(programs.programs[i]);
       }
     }
 
@@ -188,14 +127,9 @@ export default class MetadataApiClass extends BaseApiClass {
   };
 
   getOptionSets = async () => {
-    return await pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      `/api/optionSets`,
-      { paging: false },
-      ["fields=id,displayName,options[id,displayName,code,sortOrder]"]
-    );
+    return await pull(this.baseUrl, this.username, this.password, `/api/optionSets`, { paging: false }, [
+      "fields=id,displayName,options[id,displayName,code,sortOrder]",
+    ]);
   };
 
   convertProgramMetadata = async (p) => {
@@ -214,21 +148,12 @@ export default class MetadataApiClass extends BaseApiClass {
     const cacheOptions = JSON.parse(localStorage.getItem("optionSets"));
 
     let optionSets = null;
-    if (
-      cacheOptions &&
-      cacheOptions.expiration &&
-      new Date().getTime() < cacheOptions.expiration
-    ) {
+    if (cacheOptions && cacheOptions.expiration && new Date().getTime() < cacheOptions.expiration) {
       optionSets = cacheOptions.value;
     } else {
-      optionSets = await pull(
-        this.baseUrl,
-        this.username,
-        this.password,
-        `/api/optionSets`,
-        { paging: false },
-        ["fields=id,displayName,options[id,displayName,code,sortOrder]"]
-      );
+      optionSets = await pull(this.baseUrl, this.username, this.password, `/api/optionSets`, { paging: false }, [
+        "fields=id,displayName,options[id,displayName,code,sortOrder]",
+      ]);
 
       const newCacheOptions = {
         value: optionSets,
@@ -244,29 +169,28 @@ export default class MetadataApiClass extends BaseApiClass {
     programMetadata.trackedEntityType = p.trackedEntityType.id;
     programMetadata.organisationUnits = p.organisationUnits;
     programMetadata.programSections = p.programSections;
-    programMetadata.trackedEntityAttributes =
-      p.programTrackedEntityAttributes.map((ptea) => {
-        const tea = {
-          compulsory: ptea.mandatory,
-          id: ptea.trackedEntityAttribute.id,
-          displayName: ptea.trackedEntityAttribute.displayName,
-          displayFormName: ptea.trackedEntityAttribute.displayFormName
-            ? ptea.trackedEntityAttribute.displayFormName
-            : ptea.trackedEntityAttribute.displayShortName,
-          valueType: ptea.trackedEntityAttribute.valueType,
-          valueSet: null,
-          displayInList: ptea.displayInList,
-          disabled: false,
-        };
-        if (ptea.trackedEntityAttribute.optionSet) {
-          tea.valueSet = optionSets.optionSets
-            .find((os) => os.id === ptea.trackedEntityAttribute.optionSet.id)
-            .options.map((o) => {
-              return { value: o.code, label: o.displayName };
-            });
-        }
-        return tea;
-      });
+    programMetadata.trackedEntityAttributes = p.programTrackedEntityAttributes.map((ptea) => {
+      const tea = {
+        compulsory: ptea.mandatory,
+        id: ptea.trackedEntityAttribute.id,
+        displayName: ptea.trackedEntityAttribute.displayName,
+        displayFormName: ptea.trackedEntityAttribute.displayFormName
+          ? ptea.trackedEntityAttribute.displayFormName
+          : ptea.trackedEntityAttribute.displayShortName,
+        valueType: ptea.trackedEntityAttribute.valueType,
+        valueSet: null,
+        displayInList: ptea.displayInList,
+        disabled: false,
+      };
+      if (ptea.trackedEntityAttribute.optionSet) {
+        tea.valueSet = optionSets.optionSets
+          .find((os) => os.id === ptea.trackedEntityAttribute.optionSet.id)
+          .options.map((o) => {
+            return { value: o.code, label: o.displayName };
+          });
+      }
+      return tea;
+    });
 
     programMetadata.programStages = p.programStages.map((ps) => {
       const programStage = {
@@ -305,46 +229,24 @@ export default class MetadataApiClass extends BaseApiClass {
   };
 
   getOrgUnitGroups = () =>
-    pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/organisationUnitGroups",
-      { paging: false },
-      [
-        "fields=id,displayName,access,organisationUnits[id,displayName,path]",
-        "filter=access.read:eq:true",
-      ]
-    );
+    pull(this.baseUrl, this.username, this.password, "/api/organisationUnitGroups", { paging: false }, [
+      "fields=id,displayName,access,organisationUnits[id,displayName,path]",
+      "filter=access.read:eq:true",
+    ]);
 
   getOrgUnitLevels = () =>
-    pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/organisationUnitLevels",
-      { paging: false },
-      ["fields=id,displayName,level", "filter=access.read:eq:true"]
-    );
+    pull(this.baseUrl, this.username, this.password, "/api/organisationUnitLevels", { paging: false }, [
+      "fields=id,displayName,level",
+      "filter=access.read:eq:true",
+    ]);
 
   getTrackedEntityAttributes = async () =>
-    pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/trackedEntityAttributes",
-      { paging: false }
-    );
+    pull(this.baseUrl, this.username, this.password, "/api/trackedEntityAttributes", { paging: false });
 
   getTrackerDataElements = async () =>
-    pull(
-      this.baseUrl,
-      this.username,
-      this.password,
-      "/api/dataElements",
-      { paging: false },
-      ["filter=domainType:eq:TRACKER"]
-    );
+    pull(this.baseUrl, this.username, this.password, "/api/dataElements", { paging: false }, [
+      "filter=domainType:eq:TRACKER",
+    ]);
 
   getUsers = async () =>
     pull(this.baseUrl, this.username, this.password, "/api/users", {

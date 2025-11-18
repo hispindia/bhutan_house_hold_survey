@@ -1,12 +1,11 @@
-import db from "../db";
-import { TABLE_NAME } from ".";
 import { dataApi } from "@/api";
 import * as programManager from "@/indexDB/ProgramManager/ProgramManager";
-import * as meManager from "@/indexDB/MeManager/MeManager";
-import moment from "moment";
 import { chunk } from "lodash";
-import { toDhis2Events } from "../data/event";
+import moment from "moment";
+import { TABLE_NAME } from ".";
 import { LAST_DATE_OF_CURRENT_YEAR } from "../constants";
+import { toDhis2Events } from "../data/event";
+import db from "../db";
 
 export const getEventsRawData = async (pager, org, program) => {
   return await dataApi.get(
@@ -68,7 +67,6 @@ export const pull = async ({ handleDispatchCurrentOfflineLoading, offlineSelecte
   try {
     // Delete the table
     await db[TABLE_NAME].clear();
-    // const updatedAt = moment().subtract(3, 'months').format('YYYY-MM-DD');
     const programs = await programManager.getPrograms();
 
     for (let j = 0; j < offlineSelectedOrgUnits.length; j++) {
@@ -126,9 +124,8 @@ export const pull = async ({ handleDispatchCurrentOfflineLoading, offlineSelecte
 
 export const push = async (progressCallback) => {
   console.time("Event::push");
-  var start = performance.now();
-
   const events = await findOffline();
+  console.log({ events });
 
   if (events?.length > 0) {
     const results = await pushAndMarkOnline(toDhis2Events(events), progressCallback);
@@ -141,8 +138,7 @@ export const push = async (progressCallback) => {
   }
 
   console.timeEnd("Event::push");
-  var end = performance.now();
-  // return "Event::push - " + (end - start);
+
   return {
     status: "OK",
   };
@@ -299,10 +295,24 @@ const findHeader = (headers, name) => {
 };
 
 const convertValue = (metadata, datavalue) => {
+  console.log({ metadata, datavalue });
   switch (metadata.valueType) {
     case "BOOLEAN":
       return datavalue === "1" ? "true" : "false";
-
+    case "TRUE_ONLY":
+      // Convert 1 to "true", 0 to empty string for TRUE_ONLY fields
+      if (datavalue === "1" || datavalue === 1 || datavalue === "true") {
+        return "true";
+      } else if (
+        datavalue === "0" ||
+        datavalue === 0 ||
+        datavalue === "" ||
+        datavalue === null ||
+        datavalue === undefined
+      ) {
+        return "";
+      }
+      return datavalue;
     default:
       return datavalue;
   }
@@ -464,11 +474,11 @@ const setEvent = async (ev) => {
       }
     }
 
-    // const partitions = chunk(ids, 200);
+    const partitions = chunk(ids, 200);
 
-    // for (const partition of partitions) {
-    //   await db[TABLE_NAME].where("event").anyOf(partition).delete();
-    // }
+    for (const partition of partitions) {
+      await db[TABLE_NAME].where("event").anyOf(partition).delete();
+    }
 
     await persist(objects);
 

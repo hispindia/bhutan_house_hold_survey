@@ -15,6 +15,7 @@ export const pushMapping = [
 // Constants
 const SYNC_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes in milliseconds
 const STORAGE_KEY = "syncTime";
+const isDevelopment = import.meta.env.MODE === "development";
 
 const PushModal = ({ pushData, open, onCancel, onOk, onClose, syncError, syncCompleted }) => {
   const { isSuperuser } = useUser();
@@ -79,6 +80,13 @@ const PushModal = ({ pushData, open, onCancel, onOk, onClose, syncError, syncCom
   // Initialize countdown based on sessionStorage
   useEffect(() => {
     if (open) {
+      // Skip cooldown entirely in development mode
+      if (isDevelopment) {
+        setIsDisabled(false);
+        setCountdown(0);
+        return;
+      }
+
       const { isOnCooldown, remainingTime } = checkSyncCooldown();
 
       if (isOnCooldown) {
@@ -130,6 +138,14 @@ const PushModal = ({ pushData, open, onCancel, onOk, onClose, syncError, syncCom
 
   // Handle sync button click
   const handleSyncClick = () => {
+    // Skip cooldown in development mode
+    if (isDevelopment) {
+      if (onOk) {
+        onOk();
+      }
+      return;
+    }
+
     // Store current timestamp when sync is clicked
     sessionStorage.setItem(STORAGE_KEY, Date.now().toString());
 
