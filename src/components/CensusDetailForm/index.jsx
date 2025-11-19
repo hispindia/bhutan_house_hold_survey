@@ -14,10 +14,17 @@ import { debounce } from "lodash";
 import "./index.css";
 
 const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
-  const dataElements = useSelector((state) => state.metadata.programMetadata.programStages[0].dataElements);
+  const dataElements = useSelector(
+    (state) => state.metadata.programMetadata.programStages[0].dataElements
+  );
   const events = useSelector((state) => state.data.tei.data.currentEvents);
-  const submitEventLoading = useSelector((state) => state.data.tei.submitEventLoading);
-  const Dhis2FormItem = useMemo(() => withDhis2FormItem(dataElements)(CFormControl), [dataElements]);
+  const submitEventLoading = useSelector(
+    (state) => state.data.tei.submitEventLoading
+  );
+  const Dhis2FormItem = useMemo(
+    () => withDhis2FormItem(dataElements)(CFormControl),
+    [dataElements]
+  );
   const { form, surveyList, loadServeyFields } = useHouseholdSurveyForm(values);
 
   const { t } = useTranslation();
@@ -86,8 +93,8 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
     setFormData({ ...formData, [id]: value });
   };
 
-  const handleChange = debounce(() => {
-    loadServeyFields();
+  const handleChange = debounce((event) => {
+    loadServeyFields(event);
     form
       .validateFields()
       .then((fieldsValue) => {
@@ -153,18 +160,42 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
             key: index,
             label: name,
             input1: (
-              <Dhis2FormItem hidden={hidden} displayFormName={t("some")} id={some}>
-                <InputField value={formData[uid] || ""} hidden={permanentHide == true ? true : hidden} size="small" />
+              <Dhis2FormItem
+                hidden={hidden}
+                displayFormName={t("some")}
+                id={some}
+              >
+                <InputField
+                  value={formData[uid] || ""}
+                  hidden={permanentHide == true ? true : hidden}
+                  size="small"
+                />
               </Dhis2FormItem>
             ),
             input2: (
-              <Dhis2FormItem hidden={hidden} displayFormName={t("alot")} id={alot}>
-                <InputField value={formData[uid] || ""} hidden={permanentHide == true ? true : hidden} size="small" />
+              <Dhis2FormItem
+                hidden={hidden}
+                displayFormName={t("alot")}
+                id={alot}
+              >
+                <InputField
+                  value={formData[uid] || ""}
+                  hidden={permanentHide == true ? true : hidden}
+                  size="small"
+                />
               </Dhis2FormItem>
             ),
             input3: (
-              <Dhis2FormItem hidden={hidden} displayFormName={t(thirdRowTitle)} id={thirdRowId}>
-                <InputField value={formData[uid] || ""} hidden={permanentHide == true ? true : hidden} size="small" />
+              <Dhis2FormItem
+                hidden={hidden}
+                displayFormName={t(thirdRowTitle)}
+                id={thirdRowId}
+              >
+                <InputField
+                  value={formData[uid] || ""}
+                  hidden={permanentHide == true ? true : hidden}
+                  size="small"
+                />
               </Dhis2FormItem>
             ),
           };
@@ -192,6 +223,13 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
       ),
     },
   ];
+
+  // onFieldsChange={debounce(loadServeyFields, 1000)}
+  //     initialValues={values}
+  //     form={form}
+  //     onFinish={(fieldsValue) => {
+  //       onSubmit(fieldsValue);
+  //     }}
 
   return (
     <Form
@@ -223,7 +261,12 @@ const CensusDetailForm = ({ onSubmit, onTabChange, values }) => {
 
         {events && events.length > 0 ? (
           <Col className="rightBar">
-            <Tabs defaultActiveKey="1" size="small" items={items} onChange={onTabChange} />
+            <Tabs
+              defaultActiveKey="1"
+              size="small"
+              items={items}
+              onChange={onTabChange}
+            />
             <Button
               type="primary"
               className="mt-2"
