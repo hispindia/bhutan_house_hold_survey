@@ -1,5 +1,5 @@
 import { put, select, call } from "redux-saga/effects";
-import { generateUid,getLocation } from "../../../../utils";
+import { generateUid, getLocation } from "../../../../utils";
 import { getTeiSuccess } from "../../../actions/data/tei";
 import moment from "moment";
 import { getParentOuPatern } from "./setParentPattern";
@@ -29,9 +29,8 @@ function* handleInitNewData() {
       BUEzQEErqa7: moment().format("YYYY"),
       b4UUhQPwlRH: ouPattern,
       SHPW4d00NnM: yield call(getLocation),
-  }
-
-}
+    },
+  };
   const currentEnrollment = {
     enrollment: generatedEnrollmentId,
     orgUnit,

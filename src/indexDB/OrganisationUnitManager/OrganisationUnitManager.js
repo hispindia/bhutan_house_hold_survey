@@ -17,10 +17,7 @@ export const pull = async () => {
 
     const orgsByUser = await metadataApi.getUserOrgUnits();
 
-    if (
-      orgsByUser.organisationUnits &&
-      orgsByUser.organisationUnits.length > 0
-    ) {
+    if (orgsByUser.organisationUnits && orgsByUser.organisationUnits.length > 0) {
       const addWithinUserHierarchy = orgsByUser.organisationUnits.map((org) => {
         org.withinUserHierarchy = 1;
         return org;
@@ -46,9 +43,7 @@ export const addOrgsPath = async (orgs) => {
 
 export const getUserOrgs = async () => {
   try {
-    const orgs = await db[TABLE_NAME].where("withinUserHierarchy")
-      .equals(1)
-      .toArray();
+    const orgs = await db[TABLE_NAME].where("withinUserHierarchy").equals(1).toArray();
 
     // With children
     orgs.forEach(async (org) => {
@@ -171,7 +166,6 @@ export const getOrgWithParentsRecursive = async ({ orgUnit }) => {
     if (parentOrg) {
       org.parent = await getOrgWithParentsRecursive({ orgUnit: parentOrg.id });
     }
-    console.log({ [orgUnit]: org });
 
     return org;
   } catch (error) {

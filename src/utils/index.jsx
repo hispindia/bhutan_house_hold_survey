@@ -15,12 +15,24 @@ const sample = (d, fn = Math.random) => {
 };
 
 export const getLocation = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    // Set a 3-second timeout
+    const timeoutId = setTimeout(() => {
+      console.log("Geolocation timeout: Request took too long");
+      resolve("");
+    }, 5000);
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        clearTimeout(timeoutId);
         resolve(`[${pos.coords.longitude}, ${pos.coords.latitude}]`);
       },
-      (error) => reject(error)
+      (error) => {
+        clearTimeout(timeoutId);
+        // Handle all errors (including network errors) by returning empty string
+        console.log("Geolocation error:", error.message);
+        resolve("");
+      }
     );
   });
 };
@@ -70,7 +82,6 @@ export const convertValue = (valueType, value) => {
 const isValidDate = (date) => {
   return date && moment(date).isValid();
 };
-
 
 export const convertValueBack = (valueType, value) => {
   switch (valueType) {
