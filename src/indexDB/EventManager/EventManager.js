@@ -295,7 +295,6 @@ const findHeader = (headers, name) => {
 };
 
 const convertValue = (metadata, datavalue) => {
-  console.log({ metadata, datavalue });
   switch (metadata.valueType) {
     case "BOOLEAN":
       return datavalue === "1" ? "true" : "false";

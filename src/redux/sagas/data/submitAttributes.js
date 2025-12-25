@@ -2,15 +2,8 @@ import { call, put, select, takeLatest } from "redux-saga/effects";
 import { SUBMIT_ATTRIBUTES } from "../../types/data/tei";
 import { generateDhis2Payload } from "../../../utils";
 import { dataApi } from "../../../api";
-import {
-  mutateAttributes,
-  updateNewStatus,
-} from "../../actions/data/tei/currentTei";
-import {
-  getTeiError,
-  getTeiSuccessMessage,
-  loadTei,
-} from "../../actions/data/tei";
+import { mutateAttributes, updateNewStatus } from "../../actions/data/tei/currentTei";
+import { getTeiError, getTeiSuccessMessage, loadTei } from "../../actions/data/tei";
 import { editingAttributes } from "../../actions/data";
 import { getTeiId } from "./utils";
 import moment from "moment";
@@ -38,22 +31,14 @@ function* handleSubmitAttributes({ attributes }) {
         currentEnrollment,
         attributes,
       });
-      yield put(
-        getTeiSuccessMessage(
-          `Updated tracked entity instance: ${teiId} successfully`
-        )
-      );
+      yield put(getTeiSuccessMessage(`Updated tracked entity instance: ${teiId} successfully`));
     } else {
       yield call(postTeiToServer, {
         currentTei,
         currentEnrollment,
         attributes,
       });
-      yield put(
-        getTeiSuccessMessage(
-          `Created new tracked entity instance: ${currentTei.trackedEntity} successfully`
-        )
-      );
+      yield put(getTeiSuccessMessage(`Created new tracked entity instance: ${currentTei.trackedEntity} successfully`));
     }
     yield put(mutateAttributes(attributes));
     yield put(updateNewStatus(false));
@@ -67,11 +52,8 @@ function* handleSubmitAttributes({ attributes }) {
 }
 
 function* makePayload(attributes) {
-  
   const data = yield select((state) => state.data.tei.data);
-  const programMetadata = yield select(
-    (state) => state.metadata.programMetadata
-  );
+  const programMetadata = yield select((state) => state.metadata.programMetadata);
 
   const newCurrentTei = { ...data.currentTei, attributes };
   const { currentTei, currentEnrollment } = generateDhis2Payload(
@@ -87,9 +69,7 @@ function* makePayload(attributes) {
 function* putTeiToServer({ currentTei, currentEnrollment, attributes }) {
   console.log("putTeiToServer");
   const { offlineStatus } = yield select((state) => state.common);
-  const programMetadataId = yield select(
-    (state) => state.metadata.programMetadata.id
-  );
+  const programMetadataId = yield select((state) => state.metadata.programMetadata.id);
 
   if (offlineStatus) {
     yield call(trackedEntityManager.setTrackedEntityInstance, {
@@ -109,15 +89,11 @@ function* putTeiToServer({ currentTei, currentEnrollment, attributes }) {
 
 function* postTeiToServer({ currentTei, currentEnrollment, attributes }) {
   const { offlineStatus } = yield select((state) => state.common);
-  const programMetadataId = yield select(
-    (state) => state.metadata.programMetadata.id
-  );
+  const programMetadataId = yield select((state) => state.metadata.programMetadata.id);
   const newEnrollment = {
     ...currentEnrollment,
-    enrolledAt: moment([+attributes.BUEzQEErqa7, 11, 31]).format("YYYY-MM-DD"),
-    incidentDate: moment([+attributes.BUEzQEErqa7, 11, 31]).format(
-      "YYYY-MM-DD"
-    ),
+    enrolledAt: moment().format("YYYY-MM-DD"),
+    incidentDate: moment().format("YYYY-MM-DD"),
   };
 
   console.log("postTeiToServer", {

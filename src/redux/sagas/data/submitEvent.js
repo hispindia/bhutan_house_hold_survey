@@ -53,8 +53,8 @@ function* handleEditEventDate({ year }) {
 
   const newCurrentEvent = {
     ...currentEvent,
-    occurredAt: `${year}-12-31`,
-    dueDate: `${year}-12-31`,
+    occurredAt: moment().format("YYYY-MM-DD"),
+    dueDate: moment().format("YYYY-MM-DD"),
   };
   let payloadTransformed = yield call(transformEvent, {
     dataValues: { ...newCurrentEvent.dataValues },
@@ -104,8 +104,6 @@ function* handleCloneEvent({ year }) {
     return listEvents.pop();
   }
   let previousEvent = yield call(getLastestEvent);
-
-  console.log({ previousEvent });
 
   // clone from previous event if it's exist - and clone active user only
   // let isCloned = false;
