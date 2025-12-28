@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo } from "react";
-import { FORM_ACTION_TYPES, HAS_INITIAN_NOVALUE } from "../constants";
-import useForm from "../../hooks/useForm";
 import { InputAdornment } from "@material-ui/core";
 import _ from "lodash";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import useForm from "../../hooks/useForm";
+import { FORM_ACTION_TYPES } from "../constants";
 
 // components
-import InputField from "../InputFieldCore/InputField.component.jsx";
 import { useTranslation } from "react-i18next";
+import InputField from "../InputFieldCore/InputField.component.jsx";
 
 CaptureForm.defaultProps = {
   maxDate: new Date(),
@@ -29,26 +29,15 @@ function CaptureForm(props) {
     editRowCallback = null,
     locale,
     allowFormEditable,
+    handleSaveButton,
+    dialogControl,
     ...other
   } = props;
-  const {
-    formData,
-    prevData,
-    setFormData,
-    changeValue,
-    formMetadata,
-    changeMetadata,
-    initFromData,
-    validation,
-    onSubmit,
-    clear,
-  } = useForm(data, {
+  const { formData, prevData, setFormData, changeValue, initFromData, validation, onSubmit, clear } = useForm(data, {
     compulsory: t("thisFieldIsRequired"),
   });
 
-  const formAttrMetaData = useSelector(
-    (state) => state.metadata?.formMetaData || []
-  );
+  const formAttrMetaData = useSelector((state) => state.metadata?.formMetaData || []);
 
   useEffect(() => {
     initFromData(data);
@@ -61,18 +50,14 @@ function CaptureForm(props) {
     };
   }, []);
 
-  const editCall = (
-    formAttrMetaData,
-    prevData,
-    formData,
-    code,
-    value,
-    sectionKey
-  ) => {
+  const editCall = (formAttrMetaData, prevData, formData, code, value, sectionKey) => {
     let data = _.clone(formData);
 
     editRowCallback(formAttrMetaData, prevData, data, code, value, sectionKey);
     setFormData({ ...data });
+
+    const submitType = formStatus === FORM_ACTION_TYPES.ADD_NEW ? "add" : "edit";
+    handleOnSubmit(null, submitType, false); // Pass false for onBlur events
   };
 
   const generateFields = (formMetaData, sectionKey) => {
@@ -92,36 +77,21 @@ function CaptureForm(props) {
               valueSet={f.valueSet}
               pattern={f.pattern}
               valueType={f.valueType}
-              label={
-                !_.isEmpty(f.translations)
-                  ? f.translations[locale]
-                  : f.displayFormName
-              }
+              label={!_.isEmpty(f.translations) ? f.translations[locale] : f.displayFormName}
               attribute={f.attribute}
               value={formData[f.code] || ""}
-              onBlur={(value) =>
-                editCall(
-                  formAttrMetaData,
-                  prevData.current,
-                  formData,
-                  f.code,
-                  value,
-                  sectionKey
-                )
-              }
+              onBlur={(value) => editCall(formAttrMetaData, prevData.current, formData, f.code, value, sectionKey)}
               onChange={(value) => {
                 changeValue(f.code, value);
               }}
               InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">{f.prefix}</InputAdornment>
-                ),
+                startAdornment: <InputAdornment position="start">{f.prefix}</InputAdornment>,
               }}
               error={validation(f.code)}
               maxDate={props.maxDate}
               minDate={"1900-12-31"}
               data-element-id={f.code}
-            ></InputField>
+            />
           </div>
         );
       });
@@ -129,9 +99,10 @@ function CaptureForm(props) {
 
   const handleCancelForm = () => {
     setFormStatus(FORM_ACTION_TYPES.NONE);
+    dialogControl.close();
   };
 
-  const handleOnSubmit = (e, action) => {
+  const handleOnSubmit = (e, action, shouldReload) => {
     let status = onSubmit(null);
 
     if (status) {
@@ -144,6 +115,10 @@ function CaptureForm(props) {
           handleEditRow(e, row, rowIndex);
           break;
       }
+
+      shouldReload ? dialogControl.close() : null;
+
+      handleSaveButton(shouldReload);
     }
   };
 
@@ -160,9 +135,7 @@ function CaptureForm(props) {
                   <div class="card-body">
                     <h5 class="card-title">{mItem}</h5>
                     <p class="card-text">
-                      <div className="row">
-                        {generateFields(formAttrMetaData[mItem].fields, mItem)}
-                      </div>
+                      <div className="row">{generateFields(formAttrMetaData[mItem].fields, mItem)}</div>
                     </p>
                   </div>
                 </div>
@@ -174,47 +147,14 @@ function CaptureForm(props) {
       <div className="row">
         <div className="col-md-12">
           <div className="btn-toolbar" role="toolbar">
-            {formStatus === FORM_ACTION_TYPES.ADD_NEW && (
-              <div
-                className="btn-group mr-2"
-                role="group"
-                aria-label="First group"
-              >
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={(e) => handleOnSubmit(e, "add")}
-                >
-                  {t("save")}
-                </button>
-              </div>
-            )}
-            {formStatus === FORM_ACTION_TYPES.EDIT && (
-              <div
-                className="btn-group mr-2"
-                role="group"
-                aria-label="First group"
-              >
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={(e) => handleOnSubmit(e, "edit")}
-                >
-                  {t("save")}
-                </button>
-              </div>
-            )}
+            <div className="btn-group mr-2" role="group" aria-label="First group">
+              <button type="button" className="btn btn-success" onClick={(e) => handleOnSubmit(e, "edit", true)}>
+                {t("save")}
+              </button>
+            </div>
             {formStatus !== FORM_ACTION_TYPES.NONE && (
-              <div
-                className="btn-group mr-2"
-                role="group"
-                aria-label="First group"
-              >
-                <button
-                  type="button"
-                  className="btn btn-light"
-                  onClick={(e) => handleCancelForm()}
-                >
+              <div className="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" className="btn btn-light" onClick={(e) => handleCancelForm()}>
                   {t("cancel")}
                 </button>
               </div>

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Modal } from "react-bootstrap";
 import BootstrapTable from "react-bootstrap-table-next";
 import { useDispatch, useSelector } from "react-redux";
-import { defaultProgramTrackedEntityAttributeDisable, FAMILY_MEMBER_METADATA_CUSTOMUPDATE, FORM_ACTION_TYPES, HAS_INITIAN_NOVALUE, MEMBER_FORM_VALIDATIONS_SECTION, TYPE_OF_ACTION } from "../constants";
+import { FAMILY_MEMBER_METADATA_CUSTOMUPDATE, FORM_ACTION_TYPES } from "../constants";
 
 // Icon
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -11,8 +11,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 /* SELECTOR */
 import { updateCascade } from "@/redux/actions/data/tei/currentCascade";
+import { houseHoldMemberFormMetaData } from "@/redux/actions/metadata";
 import { isImmutableYear } from "@/utils/event";
+import { convertAttributesToForm, modifiedFormAttributesDisabledEnabled } from "@/utils/formMetadeta";
+import { LocalStorageMemberForm, LocalStorageSelecteRow } from "@/utils/localStorageManager";
+import { CloseOutlined } from "@ant-design/icons";
+import { Switch } from "antd";
 import _ from "lodash";
+import moment from "moment";
 import { useTranslation } from "react-i18next";
 import withDeleteConfirmation from "../../hocs/withDeleteConfirmation";
 import { changeMember } from "../../redux/actions/data/tei";
@@ -20,18 +26,12 @@ import CaptureForm from "../CaptureForm";
 import "../CustomStyles/css/bootstrap.min.css";
 import "./CascadeTable.styles.css";
 import { transformData, transformMetadataToColumns } from "./utils";
-import { CloseOutlined } from "@ant-design/icons";
-import { Switch, Tooltip } from "antd";
-import moment from "moment";
-import { convertAttributesToForm, modifiedFormAttributesDisabledEnabled } from "@/utils/formMetadeta";
-import { houseHoldMemberFormMetaData } from "@/redux/actions/metadata";
-import { LocalStorageMemberForm, LocalStorageSelecteRow } from "@/utils/localStorageManager";
+import useDisclosure from "@/hooks/useDisclosure";
 
 const formModel = new LocalStorageMemberForm();
 const rowModel = new LocalStorageSelecteRow();
 
 const DeleteConfirmationButton = withDeleteConfirmation(Button);
-
 
 const CascadeTable = (props) => {
   const {
@@ -50,6 +50,7 @@ const CascadeTable = (props) => {
     setMetadata,
     setData,
     data,
+    handleSaveButton,
     ...other
   } = props;
   const { t } = useTranslation();
@@ -57,28 +58,28 @@ const CascadeTable = (props) => {
   const { year } = useSelector((state) => state.data.tei.selectedYear);
   const { immutableYear } = useSelector((state) => state.metadata);
   const { currentCascade } = useSelector((state) => state.data.tei.data);
+  const dialogControl = useDisclosure(false);
 
   const dispatch = useDispatch();
   const [columns, setColumns] = useState(transformMetadataToColumns(metadata, locale));
   const profile = useSelector((state) => state.data.tei.data.currentTei);
   const { programMetadataMember } = useSelector((state) => state.metadata);
-  const formAttrMetaData = useSelector(state => state.metadata?.formMetaData || []);
+  const formAttrMetaData = useSelector((state) => state.metadata?.formMetaData || []);
 
   const [showData, setShowData] = useState(transformData(metadata, props.data, dataValuesTranslate, locale));
-
-  // console.log(' columns :>> ', columns, showData);
 
   const [selectedData, setSelectedData] = useState({});
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
   const [formStatus, setFormStatus] = useState(FORM_ACTION_TYPES.NONE);
-  const [editable, setEditable] = useState(false)
+  const [editable, setEditable] = useState(false);
 
   const rowEvents = {
     onClick: (e, row, rowIndex) => {
       if (isImmutableYear(year, immutableYear)) return;
-      if (e.currentTarget && e.currentTarget.contains(e.target))
+      if (e.currentTarget && e.currentTarget.contains(e.target)) {
         handleSelectRow(e, data[rowIndex], rowIndex);
+      }
     },
   };
 
@@ -88,9 +89,10 @@ const CascadeTable = (props) => {
     setMetadata(originMetadata);
     setSelectedRowIndex(null);
     setFormStatus(FORM_ACTION_TYPES.NONE);
-    formModel.set(FORM_ACTION_TYPES.NONE)
+    formModel.set(FORM_ACTION_TYPES.NONE);
+    dialogControl.close();
 
-    setEditable(false)
+    setEditable(false);
   };
 
   const handleEditRow = (e, row, rowIndex) => {
@@ -103,11 +105,8 @@ const CascadeTable = (props) => {
     };
     callbackFunction && callbackFunction(metadata, dataRows, rowIndex, "edit");
 
-    changeEventDataValue(
-      "oC9jreyd9SD",
-      JSON.stringify({ dataVals: dataRows["rows"] })
-    );
-    
+    changeEventDataValue("oC9jreyd9SD", JSON.stringify({ dataVals: dataRows["rows"] }));
+
     setData([...dataRows["rows"]]);
 
     let updatedMetadata = updateMetadata(metadata, dataRows["rows"]);
@@ -127,16 +126,15 @@ const CascadeTable = (props) => {
   const handleBeforeAddNewRow = () => {
     // Before add new data
     setFormStatus(FORM_ACTION_TYPES.ADD_NEW);
-    formModel.set(FORM_ACTION_TYPES.ADD_NEW)
+    formModel.set(FORM_ACTION_TYPES.ADD_NEW);
+    dialogControl.open();
 
-
-    setSelectedData({ id: generateUid(), isNew: true, "hDE1WNqTTwF": profile.attributes["b4UUhQPwlRH"] });
-    rowModel.set({ id: generateUid(), isNew: true, "hDE1WNqTTwF": profile.attributes["b4UUhQPwlRH"] });
+    setSelectedData({ id: generateUid(), isNew: true, hDE1WNqTTwF: profile.attributes["b4UUhQPwlRH"] });
+    rowModel.set({ id: generateUid(), isNew: true, hDE1WNqTTwF: profile.attributes["b4UUhQPwlRH"] });
     setSelectedRowIndex(null);
   };
 
   const handleAddNewRow = (e, row, continueAdd) => {
-    console.trace('row:>>>', row);
     // Add new data
     !continueAdd && setFormStatus(FORM_ACTION_TYPES.NONE);
     data.push(row);
@@ -145,13 +143,9 @@ const CascadeTable = (props) => {
       rows: data,
     };
 
-    callbackFunction &&
-      callbackFunction(metadata, dataRows, dataRows["rows"].length - 1, "add");
+    callbackFunction && callbackFunction(metadata, dataRows, dataRows["rows"].length - 1, "add");
 
-    changeEventDataValue(
-      "oC9jreyd9SD",
-      JSON.stringify({ dataVals: dataRows["rows"] })
-    );
+    changeEventDataValue("oC9jreyd9SD", JSON.stringify({ dataVals: dataRows["rows"] }));
 
     setData([...dataRows["rows"]]);
     let updatedMetadata = updateMetadata(metadata, dataRows["rows"]);
@@ -163,15 +157,14 @@ const CascadeTable = (props) => {
     };
     dispatch(updateCascade(updatedCurrentCascade));
 
-    console.log("handleAddNewRow", { updatedMetadata, dataRows });
-
     setMetadata([...updatedMetadata]);
   };
 
   const handleSelectRow = (e, row, rowIndex) => {
     console.log("selected", row);
     setFormStatus(FORM_ACTION_TYPES.EDIT);
-    formModel.set(FORM_ACTION_TYPES.EDIT)
+    formModel.set(FORM_ACTION_TYPES.EDIT);
+    dialogControl.open();
     rowModel.set(row);
     setSelectedData(row);
     setSelectedRowIndex(rowIndex);
@@ -184,12 +177,8 @@ const CascadeTable = (props) => {
       rows: data.filter((d) => d.id != row.id),
     };
 
-    callbackFunction &&
-      callbackFunction(metadata, dataRows, null, "delete_member");
-    changeEventDataValue(
-      "oC9jreyd9SD",
-      JSON.stringify({ dataVals: dataRows["rows"] })
-    );
+    callbackFunction && callbackFunction(metadata, dataRows, null, "delete_member");
+    changeEventDataValue("oC9jreyd9SD", JSON.stringify({ dataVals: dataRows["rows"] }));
     setData([...dataRows["rows"]]);
     let updatedMetadata = updateMetadata(metadata, dataRows["rows"]);
 
@@ -243,12 +232,7 @@ const CascadeTable = (props) => {
   };
 
   useEffect(() => {
-    let transformedData = transformData(
-      metadata,
-      props.data,
-      dataValuesTranslate,
-      locale
-    );
+    let transformedData = transformData(metadata, props.data, dataValuesTranslate, locale);
     setShowData(transformedData);
     setData(props.data);
     let updatedMetadata = updateMetadata(metadata, props.data); // should not transformedData
@@ -266,17 +250,11 @@ const CascadeTable = (props) => {
   }, [JSON.stringify(props.data)]);
 
   useEffect(() => {
-    let transformedData = transformData(
-      metadata,
-      data,
-      dataValuesTranslate,
-      locale
-    );
+    let transformedData = transformData(metadata, data, dataValuesTranslate, locale);
     setShowData(transformedData);
   }, [JSON.stringify(data)]);
 
   useEffect(() => {
-
     let tempDataValuesTranslate = metadata
       .filter((e) => e.valueSet && e.valueSet.length > 0)
       .reduce((obj, e) => {
@@ -290,17 +268,14 @@ const CascadeTable = (props) => {
         return obj;
       }, {});
 
-    setColumns(
-      transformMetadataToColumns(metadata, locale, tempDataValuesTranslate)
-    );
+    setColumns(transformMetadataToColumns(metadata, locale, tempDataValuesTranslate));
     setDataValuesTranslate(tempDataValuesTranslate);
 
-
-    // handle reloading 
-    const row = rowModel.get()
+    // handle reloading
+    const row = rowModel.get();
     setFormStatus(formModel.get());
     setSelectedData(row);
-    setEditable(row['isNew'] ? false : true)
+    setEditable(row["isNew"] ? false : true);
 
     return () => {
       console.log("Cascade table unmounted");
@@ -326,13 +301,19 @@ const CascadeTable = (props) => {
   useEffect(() => {
     let modifiedForms = convertAttributesToForm(programMetadataMember);
     if (formStatus === FORM_ACTION_TYPES.EDIT) {
-      modifiedForms = modifiedFormAttributesDisabledEnabled(modifiedForms, true)
-    } 
+      modifiedForms = modifiedFormAttributesDisabledEnabled(modifiedForms, true);
+    }
 
-    const includedObj = {...selectedData};
+    const includedObj = { ...selectedData };
 
-    if(selectedData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS]) {
-      editRowCallback(modifiedForms, {}, selectedData, FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS, selectedData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS]);
+    if (selectedData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS]) {
+      editRowCallback(
+        modifiedForms,
+        {},
+        selectedData,
+        FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS,
+        selectedData[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS]
+      );
       delete includedObj[FAMILY_MEMBER_METADATA_CUSTOMUPDATE.MEMBERSHIP_STATUS];
     }
 
@@ -341,13 +322,10 @@ const CascadeTable = (props) => {
       editRowCallback(modifiedForms, {}, selectedData, key, value);
     });
 
-    // dispatch(houseHoldMemberFormMetaData(modifiedForms));
-
     return () => {
       dispatch(houseHoldMemberFormMetaData({}));
-    }
-  }, [selectedData])
-
+    };
+  }, [selectedData]);
 
   const columnsC = [
     {
@@ -369,10 +347,7 @@ const CascadeTable = (props) => {
           <DeleteConfirmationButton
             variant="outline-danger"
             size="sm"
-            disabled={
-              extraData !== FORM_ACTION_TYPES.NONE ||
-              isImmutableYear(year, immutableYear)
-            }
+            disabled={extraData !== FORM_ACTION_TYPES.NONE || isImmutableYear(year, immutableYear)}
             title={t("delete")}
             onDelete={(e) => {
               handleDeleteRow(e, row);
@@ -397,59 +372,57 @@ const CascadeTable = (props) => {
   ];
 
   const handleAllowEditable = (eValue) => {
-    setEditable(eValue)
+    setEditable(eValue);
 
-    if (!data['isNew']) {
-      const modifiedEle = modifiedFormAttributesDisabledEnabled(formAttrMetaData, eValue)
-      console.log('modifiedEle', modifiedEle)
+    if (!data["isNew"]) {
+      const modifiedEle = modifiedFormAttributesDisabledEnabled(formAttrMetaData, eValue);
+      console.log("modifiedEle", modifiedEle);
       dispatch(houseHoldMemberFormMetaData(modifiedEle));
     }
-  }
+  };
   return (
     <div className="bootstrap-iso">
       <div className="container-fluid">
         <div className="row">
-          <Modal
-            backdrop="static"
-            size="xl"
-            keyboard={false}
-            show={
-              formStatus === FORM_ACTION_TYPES.ADD_NEW ||
-              formStatus === FORM_ACTION_TYPES.EDIT
-            }
-          >
+          <Modal backdrop="static" size="xl" keyboard={false} show={dialogControl.isOpen}>
             <Modal.Body>
               <Card>
                 <Card.Body>
                   <Card.Title className="d-flex justify-content-between">
                     {t("familyMemberDetails")}
                     <div className="gap-5 text-right">
-                      {formStatus == FORM_ACTION_TYPES.EDIT ?
-                        <Switch checked={!editable} onChange={() => handleAllowEditable(!editable)} checkedChildren="Editable" unCheckedChildren="Enable For edit" />
-                        : ''}
+                      {formStatus == FORM_ACTION_TYPES.EDIT ? (
+                        <Switch
+                          checked={!editable}
+                          onChange={() => handleAllowEditable(!editable)}
+                          checkedChildren="Editable"
+                          unCheckedChildren="Enable For edit"
+                        />
+                      ) : (
+                        ""
+                      )}
                       <Button type="text" className="btn btn-light" onClick={clearForm}>
                         <CloseOutlined />
                       </Button>
                     </div>
-
                   </Card.Title>
                   <Card.Subtitle className="mb-2 text-muted">
-                    {formStatus !== FORM_ACTION_TYPES.ADD_NEW &&
-                      "No." + (selectedRowIndex + 1)}
+                    {formStatus !== FORM_ACTION_TYPES.ADD_NEW && "No." + (selectedRowIndex + 1)}
                   </Card.Subtitle>
                   <CaptureForm
                     locale={locale}
-                    // metadata={metadata}
                     rowIndex={selectedRowIndex}
                     data={_.cloneDeep(selectedData)}
                     formStatus={formStatus}
                     setFormStatus={setFormStatus}
+                    dialogControl={dialogControl}
                     handleEditRow={handleEditRow}
                     handleAddNewRow={handleAddNewRow}
                     editRowCallback={editRowCallback}
                     allowFormEditable={editable}
-                    maxDate={moment(new Date()).format('YYYY-MM-DD')}
+                    maxDate={moment(new Date()).format("YYYY-MM-DD")}
                     minDate={new Date(`1900-12-31`)}
+                    handleSaveButton={handleSaveButton}
                   />
                 </Card.Body>
               </Card>
@@ -457,7 +430,6 @@ const CascadeTable = (props) => {
           </Modal>
         </div>
 
-        {/* <hr className="mb-4" /> */}
         <div className="row">
           <div className="mb-4 mr-auto mr-sm-0">
             <Button
@@ -472,9 +444,6 @@ const CascadeTable = (props) => {
               {t("addNewMember")}
             </Button>
           </div>
-          {/* <div className="col-md-4 order-md-4 mb-4">
-            <div>{externalComponents && externalComponents["nextButton"]}</div>
-          </div> */}
         </div>
         <div className="row">
           <div className="col-md-12 order-md-12 mb-12 table-sm overflow-auto table-responsive pl-0">

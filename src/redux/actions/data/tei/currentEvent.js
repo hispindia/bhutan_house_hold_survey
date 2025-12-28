@@ -1,8 +1,9 @@
 import { SUBMIT_EVENT_DATA_VALUES, UPDATE_EVENTS, SUBMIT_EVENT, SUBMIT_EVENTS } from "../../../types/data/tei";
 
-export const submitEventDataValues = (dataValues) => ({
+export const submitEventDataValues = (dataValues, reload = false) => ({
   type: SUBMIT_EVENT_DATA_VALUES,
   dataValues,
+  reload,
 });
 
 export const submitEvent = (event, doRefresh) => ({

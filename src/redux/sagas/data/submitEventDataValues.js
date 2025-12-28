@@ -2,53 +2,40 @@ import { generateUid } from "@/utils";
 import { call, put, select, takeLatest } from "redux-saga/effects";
 import { getTei } from "../../../redux/actions/data/tei";
 import { SUBMIT_EVENT_DATA_VALUES } from "../../types/data/tei";
-import {
-  generateTEIDhis2Payload,
-  makeNewCurrentEvent,
-  makeNewCurrentEvents,
-  transformEvent,
-} from "./utils";
+import { generateTEIDhis2Payload, makeNewCurrentEvent, makeNewCurrentEvents, transformEvent } from "./utils";
 
 import { submitAttributes as submitFamilyTeiAttributes } from "../../actions/data";
 
 import _ from "lodash";
 import moment from "moment";
 import { dataApi } from "@/api";
-import {
-  deleteMember,
-  getTeiError,
-  getTeiSuccessMessage,
-  loadTei,
-} from "../../actions/data/tei";
+import { deleteMember, getTeiError, getTeiSuccessMessage, loadTei } from "../../actions/data/tei";
 import { updateCascade } from "../../actions/data/tei/currentCascade";
 import { updateEvents } from "../../actions/data/tei/currentEvent";
 import * as eventManager from "@/indexDB/EventManager/EventManager";
 import * as trackedEntityManager from "@/indexDB/TrackedEntityManager/TrackedEntityManager";
 import { getEventsByYear } from "@/utils/event";
 
-function* handleSubmitEventDataValues({ dataValues }) {
-  console.log("handleSubmitEventDataValues", { dataValues });
+function* handleSubmitEventDataValues({ dataValues, reload = false }) {
+  console.log("handleSubmitEventDataValues", { dataValues, reload });
 
   // Trick - clear oC9jreyd9SD to be able to submit new data
   delete dataValues.oC9jreyd9SD;
 
   const { offlineStatus } = yield select((state) => state.common);
 
-  yield put(loadTei(true));
+  // Only show loading indicator when reload is true
+  if (reload) {
+    yield put(loadTei(true));
+  }
 
   // metadata
   const { programMetadataMember } = yield select((state) => state.metadata);
-  const memberProgramStageIDs = programMetadataMember.programStages.map(
-    (programStage) => programStage.id
-  );
+  const memberProgramStageIDs = programMetadataMember.programStages.map((programStage) => programStage.id);
   // data
-  const { year, selected6Month } = yield select(
-    (state) => state.data.tei.selectedYear
-  );
+  const { year, selected6Month } = yield select((state) => state.data.tei.selectedYear);
 
-  const { currentTei, currentCascade } = yield select(
-    (state) => state.data.tei.data
-  );
+  const { currentTei, currentCascade } = yield select((state) => state.data.tei.data);
   const { selectedMember } = yield select((state) => state.data.tei);
   // const selectedMemberData = yield call(getSelectedMemberData);
 
@@ -57,17 +44,11 @@ function* handleSubmitEventDataValues({ dataValues }) {
   process.env.NODE_ENV && console.log("selectedYear", { year, selected6Month });
 
   const newCurrentEvent = yield call(makeNewCurrentEvent, dataValues);
-  const newCurrentEventPayload = yield call(
-    makeNewCurrentEventPayload,
-    dataValues
-  );
+  const newCurrentEventPayload = yield call(makeNewCurrentEventPayload, dataValues);
 
   const newCurrentEvents = yield call(makeNewCurrentEvents, dataValues);
   const newCurrentEventsByYear = getEventsByYear(newCurrentEvents, year);
-  const newCurrentEventsPayload = yield call(
-    makeNewCurrentEventsPayload,
-    newCurrentEventsByYear
-  );
+  const newCurrentEventsPayload = yield call(makeNewCurrentEventsPayload, newCurrentEventsByYear);
 
   process.env.NODE_ENV && console.log({ currentTei });
   process.env.NODE_ENV && console.log({ newCurrentEvent });
@@ -95,9 +76,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
     // if (!currentCascade) return;
 
     // Update cascade to REDUX store
-    const newCurrentCascade = currentCascade
-      ? JSON.parse(JSON.stringify(currentCascade))
-      : {};
+    const newCurrentCascade = currentCascade ? JSON.parse(JSON.stringify(currentCascade)) : {};
 
     process.env.NODE_ENV && console.log({ newCurrentCascade });
     yield put(updateCascade(newCurrentCascade));
@@ -108,20 +87,13 @@ function* handleSubmitEventDataValues({ dataValues }) {
       // OFFLINE MODE
       let memberTEI = {};
       if (offlineStatus) {
-        memberTEI = yield call(
-          trackedEntityManager.getTrackedEntityInstanceById,
-          {
-            trackedEntity: selectedMember.id,
-            program: programMetadataMember.id,
-          }
-        );
+        memberTEI = yield call(trackedEntityManager.getTrackedEntityInstanceById, {
+          trackedEntity: selectedMember.id,
+          program: programMetadataMember.id,
+        });
       } else {
         // In Online mode - if cannot find TEI -> catch errors
-        memberTEI = yield call(
-          dataApi.getTrackedEntityInstanceById,
-          selectedMember.id,
-          programMetadataMember.id
-        );
+        memberTEI = yield call(dataApi.getTrackedEntityInstanceById, selectedMember.id, programMetadataMember.id);
       }
 
       process.env.NODE_ENV && console.log({ memberTEI, selectedMember });
@@ -131,17 +103,9 @@ function* handleSubmitEventDataValues({ dataValues }) {
         // IF ENR exist
         if (memberTEI.enrollments.length > 0) {
           // get event by current YEAR
-          let eventByYear = _.filter(
-            memberTEI.enrollments[0].events,
-            function (n) {
-              return moment(n.occurredAt).isBetween(
-                `${year}-01-01`,
-                `${year}-12-31`,
-                undefined,
-                "[]"
-              );
-            }
-          );
+          let eventByYear = _.filter(memberTEI.enrollments[0].events, function (n) {
+            return moment(n.occurredAt).isBetween(`${year}-01-01`, `${year}-12-31`, undefined, "[]");
+          });
 
           process.env.NODE_ENV && console.log({ year, eventByYear });
 
@@ -171,9 +135,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
 
               const lastestEventsByYear = memberProgramStageIDs
                 .map((programStageID) => {
-                  return eventByYear.find(
-                    (event) => event.programStage === programStageID
-                  );
+                  return eventByYear.find((event) => event.programStage === programStageID);
                 })
                 .filter(Boolean);
 
@@ -191,8 +153,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
                   },
                   programMetadataMember
                 );
-                process.env.NODE_ENV &&
-                  console.log("all TEI,ERN,EVENT exist", updatedMemberTei);
+                process.env.NODE_ENV && console.log("all TEI,ERN,EVENT exist", updatedMemberTei);
                 yield call(pushTEI, updatedMemberTei);
               } catch (error) {
                 console.log("all TEI,ERN,EVENT exist", error);
@@ -207,16 +168,14 @@ function* handleSubmitEventDataValues({ dataValues }) {
                   dueDate: newCurrentEvent.occurredAt,
                 };
 
-                const newEvents = memberProgramStageIDs.map(
-                  (programStageID) => {
-                    return {
-                      event: generateUid(),
-                      occurredAt: newCurrentEvent.occurredAt,
-                      dueDate: newCurrentEvent.occurredAt,
-                      programStage: programStageID,
-                    };
-                  }
-                );
+                const newEvents = memberProgramStageIDs.map((programStageID) => {
+                  return {
+                    event: generateUid(),
+                    occurredAt: newCurrentEvent.occurredAt,
+                    dueDate: newCurrentEvent.occurredAt,
+                    programStage: programStageID,
+                  };
+                });
 
                 // Generate member payload - UPDATE
                 let updatedMemberTei = yield call(
@@ -230,8 +189,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
                   },
                   programMetadataMember
                 );
-                process.env.NODE_ENV &&
-                  console.log("no EVENT", updatedMemberTei);
+                process.env.NODE_ENV && console.log("no EVENT", updatedMemberTei);
                 yield call(pushTEI, updatedMemberTei);
               } catch (error) {
                 console.log("no EVENT", error);
@@ -281,6 +239,7 @@ function* handleSubmitEventDataValues({ dataValues }) {
         // In Offline mode - if cannot find TEI -> catch errors
         throw new Error("TEI not exist");
       }
+
       yield put(getTeiSuccessMessage(`Update successfully`));
     } catch (e) {
       // not exist TEI
@@ -330,7 +289,6 @@ function* handleSubmitEventDataValues({ dataValues }) {
           );
           console.log("no TEI", updatedMemberTei);
           yield call(pushTEI, updatedMemberTei);
-          // yield put(getTeiSuccessMessage(`Created successfully`));
         } catch (error) {
           console.log("no TEI", error);
         }
@@ -340,8 +298,10 @@ function* handleSubmitEventDataValues({ dataValues }) {
     console.error("handleSubmitEventDataValues", e.message);
     yield put(getTeiError(e.message));
   } finally {
-    // refresh TEI
-    yield put(getTei(currentTei.trackedEntity));
+    if (reload) {
+      // refresh TEI
+      yield put(getTei(currentTei.trackedEntity));
+    }
     yield put(loadTei(false));
   }
 }
@@ -387,14 +347,8 @@ function* getSelectedMemberData() {
 
   let selectedMemberData = null;
 
-  if (
-    currentCascade &&
-    currentCascade[year] &&
-    currentCascade[year].length > 0
-  ) {
-    selectedMemberData = currentCascade[year].find(
-      (m) => m.id === selectedMember.id
-    );
+  if (currentCascade && currentCascade[year] && currentCascade[year].length > 0) {
+    selectedMemberData = currentCascade[year].find((m) => m.id === selectedMember.id);
   }
 
   return selectedMemberData;

@@ -6,7 +6,6 @@ import _ from "lodash";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import withSkeletonLoading from "../../hocs/withSkeletonLoading";
-import originMetadata from "./originMetadata.jsx";
 
 /* REDUX */
 import { useDispatch, useSelector } from "react-redux";
@@ -18,19 +17,14 @@ import { changeMember } from "../../redux/actions/data/tei";
 import { calculateAgeGroup } from "./FormCalculationUtils";
 
 // Styles
+import { houseHoldMemberFormMetaData } from "@/redux/actions/metadata";
+import { calculateAge } from "@/utils/event";
+import { convertOriginMetadata } from "@/utils/formMetadeta";
 import "../../index.css";
-import styles from "./FamilyMemberForm.module.css";
 import {
-  AREANUT_CONSUMPTION,
-  BLOOD_PRESSURE_READING1,
-  BLOOD_PRESSURE_READING2,
-  BLOOD_PRESSURE_READING3,
-  DEMOGRAPHIC_DETAILS,
   FAMILY_MEMBER_METADATA_CUSTOMUPDATE,
   FAMILY_MEMBER_VALUE,
-  FULL_ALCOHAL_CONSUMPTION,
   HAS_INITIAN_NOVALUE,
-  HEIGHT_WEIGHT,
   HHM2_ALCOHAL_CONSUMPTION12_MONTH,
   HHM2_ALCOHOL_CONSUMPTION,
   HHM2_ALCOHOL_CONSUMTION_FREQUENCY,
@@ -39,7 +33,6 @@ import {
   HHM2_BLOODSUGER_MEASERD_SECTION,
   HHM2_BLOODSUGER_MEASERDBY_DOCTOR,
   HHM2_DIABETESDOCTOR_SECTION,
-  HHM2_DIET,
   HHM2_HYPERTENSION_DIAGNOSIS_BY_DOCTOR,
   HHM2_INTENSE_SPORTS,
   HHM2_MINS_CYCLING,
@@ -53,26 +46,11 @@ import {
   HHM2_WEEKLY_FRUIT_CONSUMTION,
   HHM2_WEEKLY_VEGETABLE_CONSUMTION,
   HHM2_WORK_RELATED_PHYSICAL_EXERTION,
-  HISTORY_OF_CARDIOVASCULAR,
-  HISTORY_OF_CHOLESTEROL,
-  HISTORY_OF_DIABETES,
-  HISTORY_RISEDBLOOD_PRESSURE,
   MEMBER_FORM_VALIDATIONS_SECTION,
-  MORTALITY_INFORMATION,
   MOTHER_CHILD_CUSTOM_HIDE,
-  MOTHER_CHILD_SECTION,
-  PHYSICAL_ACTIVITY_RECREATIONAL,
-  PHYSICAL_ACTIVITY_TRAVEL,
-  PHYSICAL_ACTIVITY_WORK,
-  PHYSICAL_MEASUREMENT_BLOOD_PRESSURE,
-  TOBACCO_USE,
-  TYPE_OF_ACTION,
-  WAISE_HIP_CIRCUMFERENCE,
-  WG_SORT_SET,
+  TYPE_OF_ACTION
 } from "../constants";
-import { calculateAge } from "@/utils/event";
-import { convertAttributesToForm, convertOriginMetadata } from "@/utils/formMetadeta";
-import { houseHoldMemberFormMetaData } from "@/redux/actions/metadata";
+import styles from "./FamilyMemberForm.module.css";
 
 const { familyMemberFormContainer, cascadeTableWrapper } = styles;
 const LoadingCascadeTable = withSkeletonLoading()(CascadeTable);
@@ -96,6 +74,7 @@ const FamilyMemberForm = ({
   events,
   externalComponents,
   setDisableCompleteBtn,
+  handleSaveButton,
   ...props
 }) => {
   const { t } = useTranslation();
@@ -1436,6 +1415,7 @@ const FamilyMemberForm = ({
             externalComponents={externalComponents}
             maxDate={`${year}-12-31`}
             minDate={props.minDate}
+            handleSaveButton={handleSaveButton}
           />
         </Paper>
       </div>

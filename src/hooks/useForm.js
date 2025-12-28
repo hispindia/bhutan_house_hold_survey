@@ -1,10 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import _ from "lodash";
-import {
-  FAMILY_MEMBER_METADATA_CUSTOMUPDATE,
-  MIN_MAX_TEXT,
-  MOBILE_NUM_REGEX,
-} from "@/components/constants";
+import { FAMILY_MEMBER_METADATA_CUSTOMUPDATE, MIN_MAX_TEXT, MOBILE_NUM_REGEX } from "@/components/constants";
 import { useSelector } from "react-redux";
 
 const useForm = (data, uiLocale) => {
@@ -13,11 +9,7 @@ const useForm = (data, uiLocale) => {
   const [warningLocale, setWarningLocale] = useState(uiLocale);
   const [validationText, setValidationText] = useState({});
 
-  const formAttrMetaData = useSelector(
-    (state) => state.metadata?.formMetaData || []
-  );
-
-  // console.log('formAttrMetaData :>> ', formAttrMetaData);
+  const formAttrMetaData = useSelector((state) => state.metadata?.formMetaData || []);
 
   const validationTypes = ["compulsory"];
   const prevData = useRef(data);
@@ -27,8 +19,7 @@ const useForm = (data, uiLocale) => {
     switch (type) {
       case "compulsory":
         if (value == "" || value == null || value == undefined) {
-          if (warningLocale && warningLocale.compulsory)
-            return { text: warningLocale.compulsory };
+          if (warningLocale && warningLocale.compulsory) return { text: warningLocale.compulsory };
           return { text: "This field is required" };
         }
 
@@ -51,19 +42,11 @@ const useForm = (data, uiLocale) => {
           if (formData[ele]) {
             console.log(
               "(Number(formData[ele]) <= elements[ele].min) || (Number(formData[ele]) >= elements[ele].max) :>> ",
-              Number(formData[ele]) <= elements[ele].min &&
-                Number(formData[ele]) >= elements[ele].max
+              Number(formData[ele]) <= elements[ele].min && Number(formData[ele]) >= elements[ele].max
             );
-            if (
-              Number(formData[ele]) <= elements[ele].min ||
-              Number(formData[ele]) >= elements[ele].max
-            ) {
+            if (Number(formData[ele]) <= elements[ele].min || Number(formData[ele]) >= elements[ele].max) {
               valText[ele] = {
-                text:
-                  "Value range:Minimum " +
-                  elements[ele].min +
-                  " and maximum " +
-                  elements[ele].max,
+                text: "Value range:Minimum " + elements[ele].min + " and maximum " + elements[ele].max,
               };
             } else delete valText[ele];
           }
@@ -89,19 +72,12 @@ const useForm = (data, uiLocale) => {
   };
 
   const changeValue = (property, value) => {
-    console.log("changeValue called");
     let temp = JSON.parse(JSON.stringify(formData));
     prevData.current = { ...temp };
 
-    if (
-      property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER &&
-      value.length < 9
-    ) {
+    if (property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER && value.length < 9) {
       formData[property] = value;
-    } else if (
-      property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER &&
-      value.length > 8
-    ) {
+    } else if (property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER && value.length > 8) {
     } else if (property == FAMILY_MEMBER_METADATA_CUSTOMUPDATE.NAME) {
       formData[property] = value.replace(/[^a-zA-Z\s]/g, "");
     } else formData[property] = value;
@@ -112,7 +88,6 @@ const useForm = (data, uiLocale) => {
 
   const changeMetadata = (metadata) => {
     console.log("changeMetadata :>> ", metadata);
-    // setMetadata(metadata);
     onSubmit();
   };
 
@@ -126,11 +101,9 @@ const useForm = (data, uiLocale) => {
 
   const onSubmit = (external) => {
     // run validation layer 1
-
     let valText = {};
 
     validationTypes.forEach((vt) => {
-      // let filterMDbyType = _.filter(formMetadata, { [vt]: true });
       let filterMDbyType = [];
 
       for (let sectyionKey in formAttrMetaData) {
@@ -155,11 +128,7 @@ const useForm = (data, uiLocale) => {
     }
 
     customValidationCheck("min_max", MIN_MAX_TEXT, valText);
-    customValidationCheck(
-      "contact",
-      FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER,
-      valText
-    );
+    customValidationCheck("contact", FAMILY_MEMBER_METADATA_CUSTOMUPDATE.CONTECT_NUMBER, valText);
 
     // custom fields validations
     setValidationText(valText);
