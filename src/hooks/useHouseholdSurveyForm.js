@@ -61,8 +61,31 @@ const useHouseholdSurveyForm = (values) => {
     // console.log('event:>>>', event)
     const uuid = event[0]?.name[0];
     const value = event[0]?.value;
+    //validation for Negative value not enter 
+    const NO_NEGATIVE_DATAELEMENTS = [
 
+      "Ojvu6krZKBX",
+      "WTFyAoDjI4X"
+    ];
     if (event.length) {
+       //validation for Negative value not enter 
+      if (
+        NO_NEGATIVE_DATAELEMENTS.includes(uuid) &&
+        value !== null &&
+        value !== "" &&
+        !isNaN(value) &&
+        Number(value) < 0
+      ) {
+        // Reset the value immediately
+        form.setFieldsValue({ [uuid]: null });
+
+        // Do NOT continue further logic
+        return;
+      }
+
+      // ✅ Store valid value
+      values[uuid] = value;
+      //validation for Negative value not enter 
       values[uuid] = value;
       if (uuid == "NPb0hOBn6g9" && value == "Empty") {
         let keysToKeep = ["NPb0hOBn6g9", "tjXaQPI9OcQ"];
